@@ -1,0 +1,60 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/connect/token",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/security-api/connect/token",
+      "UpstreamHttpMethod": ["Post"],
+      "ServiceName": "security-api"
+    },
+    {
+      "DownstreamPathTemplate": "/.well-known/openid-configuration",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/security-api/.well-known/openid-configuration",
+      "UpstreamHttpMethod": ["Get"],
+      "ServiceName": "security-api"
+    },
+    {
+      "DownstreamPathTemplate": "/users/{role}/register",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/security-api/users/{role}/register",
+      "UpstreamHttpMethod": ["Post"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security",
+        "AllowedScopes": ["orders.write", "deliveries.write"]
+      },
+      "ServiceName": "security-api"
+    },
+    {
+      "DownstreamPathTemplate": "/users",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/security-api/users",
+      "UpstreamHttpMethod": ["Patch"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security",
+        "AllowedScopes": ["users.update"]
+      },
+      "ServiceName": "security-api"
+    },
+    {
+      "DownstreamPathTemplate": "/users/{userName}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/security-api/users/{userName}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security",
+        "AllowedScopes": ["users.read"]
+      },
+      "ServiceName": "security-api"
+    }
+  ]
+}

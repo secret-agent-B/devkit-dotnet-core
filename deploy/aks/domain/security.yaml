@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: security-deployment
+  labels:
+    app: snappy
+    name: security-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: security-pod
+  template: 
+    metadata:
+      name: security-pod
+      labels:
+        app: snappy
+        name: security-pod
+
+    spec:
+      containers:
+      - name: security
+        image: snappy.azurecr.io/devkit-security:#{Build.BuildId}#
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports: 
+          - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: envvar-configmap
+        - secretRef:
+            name: api-secrets
+        - secretRef:
+            name: security-secrets
+        volumeMounts:
+        - mountPath: app/infrastructure
+          name: base-settings
+        - mountPath: app/configs
+          name: security-settings
+      volumes:
+      - name: security-settings
+        configMap:
+          name: security-settings-configmap
+      - name: base-settings
+        configMap: 
+          name: base-settings-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: security-clusterip
+  labels:
+    app: snappy
+    name: security-clusterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: security-pod
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: security-settings-configmap
+data:
+  appsettings.json: |-
+    {
+      "AllowedHosts": "*",
+      "APIDefinition": {
+          "Name": "Devkit Security API",
+          "Description": "Security API keeps the bad guys away from the system.",
+          "Version": "v1"
+      },
+      "ConsulConfiguration": {
+          "ConsulHost": "http://consul-clusterip:8500",
+          "ServiceName": "security-api",
+          "DataCenter": "dc1",
+          "ServiceId": "devkit.security",
+          "Port": "80",
+          "Tags": [
+              "devkit",
+              "security",
+              "internal"
+          ],
+          "Meta": {
+              "version": "1.0.0",
+              "sdk": "devkit",
+              "type": "shared",
+              "domain": "security"
+          }
+      },
+    }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: security-secrets
+  labels:
+    app: snappy
+    name: security-secrets
+
+data:
+  RepositoryOptions__DatabaseName: c2VjdXJpdHk=
+  RepositoryOptions__ConnectionString: bW9uZ29kYitzcnY6Ly9zbmFwcHktdGVzdDpQYXNzdzByZDEyMyUyNC10ZXN0QHNuYXBweWNsdXN0ZXIuY2dkcjIubW9uZ29kYi5uZXQvc2VjdXJpdHk/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5
+  GOOGLE_CLIENT_ID: Z3Vlc3QK
+  GOOGLE_SECRET: UGFzc3cwcmQxMjMk
+  FACEBOOK_CLIENT_ID: Z3Vlc3QK
+  FACEBOOK_SECRET: UGFzc3cwcmQxMjMk

@@ -1,0 +1,14 @@
+{
+  "Serilog": {
+    "Using": ["Serilog.Sinks.Console", "Serilog.Sinks.ElasticSearch"],
+    "MinimumLevel": "Information",
+    "Properties": {
+      "Application": "Snappy"
+    }
+  },
+  "ElasticsearchConfiguration": {
+    "Uri": "http://devkit.elasticsearch:9200",
+    "Username": "elastic",
+    "Password": "Passw0rd123$"
+  }
+}

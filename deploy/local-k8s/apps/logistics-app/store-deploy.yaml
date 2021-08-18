@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: logistics-api-ns
+  name: store-deploy
+  labels:
+    name: store-deploy
+    app: logistics-app
+    tier: api
+spec:
+  selector:
+    matchLabels:
+      name: store-pod
+      app: logistics-app
+      tier: api      
+  template:
+    metadata:
+      namespace: logistics-api-ns
+      name: store-pod
+      labels:
+        name: store-pod
+        app: logistics-app
+        tier: api
+    spec:
+      containers:
+        - name: store
+          image: logistics.orders:latest
+          ports:
+            - containerPort: 443
+    
+  

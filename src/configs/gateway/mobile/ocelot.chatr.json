@@ -1,0 +1,30 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "ws",
+      "UpstreamPathTemplate": "/chatr-api/{catchAll}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "chatr-api"
+    },
+    {
+      "DownstreamPathTemplate": "/sessions/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/chatr-api/sessions/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "chatr-api"
+    }
+  ]
+}

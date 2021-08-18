@@ -1,0 +1,483 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  namespace: devkit-ns
+  labels:
+    app: snappy
+    name: gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snappy
+      name: gateway-pod
+  template:
+    metadata:
+      name: gateway-pod
+      labels:
+        app: snappy
+        name: gateway-pod
+    spec:
+      containers:
+      - name: gateway
+        image: snappy.azurecr.io/devkit-gateway:#{Build.BuildId}#
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        env:
+        - name: DEVKIT_GATEWAY_TYPE
+          value: mobile
+        - name: LOG_INDEX
+          value: devkit.gateway
+        - name: OCELOT_CONFIG_PATH
+          value: configs/
+        envFrom:
+        - configMapRef:
+            name: envvar-configmap
+        - secretRef:
+            name: api-secrets
+        volumeMounts:
+        - mountPath: app/infrastructure
+          name: base-settings
+        - mountPath: app/configs
+          name: gateway-settings
+        - mountPath: app/configs/mobile
+          name: ocelot
+      volumes:
+      - name: gateway-settings
+        configMap:
+          name: gateway-settings-configmap
+      - name: base-settings
+        configMap: 
+          name: base-settings-configmap
+      - name: ocelot
+        configMap:
+          name: ocelot-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: gateway-clusterip
+  labels:
+    app: snappy
+    name: gateway-clusterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: gateway-pod
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: gateway-settings-configmap
+  labels:
+    app: snappy
+    name: gateway-settings-configmap
+
+data: 
+ 
+  appsettings.json: |
+    {
+      "AllowedHosts": "*",
+      "APIDefinition": {
+        "Name": "Devkit Gateway API",
+        "Description": "Serves are the single entry point of the system.",
+        "Version": "v1"
+      },
+      "ConsulConfiguration": {
+        "ConsulHost": "http://consul-clusterip:8500",
+        "ClusterIP": "gateway-clusterip",
+        "ServiceName": "gateway-api",
+        "DataCenter": "dc1",
+        "ServiceId": "devkit.gateway",
+        "Port": "80",
+        "Tags": ["devkit", "gateway", "extenal"],
+        "Meta": {
+          "version": "1.0.0",
+          "sdk": "devkit",
+          "type": "shared",
+          "domain": "gateway"
+        }
+      },
+      "SecurityConfiguration": {
+        "AuthenticationConfiguration": {
+          "APIResourceName": "mobile-gateway",
+          "APIResourceSecret": "secret",
+          "AuthenticationProviderKey": "devkit-security",
+          "CacheDurationInMinutes": 60,
+          "IdentityServerHost": "http://security-clusterip/",
+          "RequireHttpsMetadata": false,
+          "RoleClaimType": "role"
+        },
+        "AuthorizationPolicies": [
+          {
+            "Name": "admin-policy",
+            "ClaimRequirements": [
+              {
+                "Type": "role",
+                "Requirements": ["administrator", "user"]
+              }
+            ]
+          },
+          {
+            "Name": "driver-policy",
+            "ClaimRequirements": [
+              {
+                "Type": "role",
+                "Requirements": ["driver", "user"]
+              }
+            ]
+          },
+          {
+            "Name": "client-policy",
+            "ClaimRequirements": [
+              {
+                "Type": "role",
+                "Requirements": ["client", "user"]
+              }
+            ]
+          },
+          {
+            "Name": "test-policy",
+            "ClaimRequirements": [
+              {
+                "Type": "role",
+                "Requirements": ["user"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: ocelot-configmap
+  labels:
+    app: snappy
+    name: ocelot-configmap
+data:
+
+  ocelot.chatr.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "ws",
+          "UpstreamPathTemplate": "/chatr-api/{catchAll}",
+          "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "chatr-api"
+        },
+        {
+          "DownstreamPathTemplate": "/sessions/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/chatr-api/sessions/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "chatr-api"
+        }
+      ]
+    }
+  ocelot.filestore.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/file-store-api/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "ServiceName": "file-store-api"
+        }
+      ]
+    }
+  ocelot.global.json: |
+    {
+      "GlobalConfiguration": {
+        "RequestIdKey": "mobile-request",
+        "ServiceDiscoveryProvider": {
+          "Host": "consul-clusterip",
+          "Port": 8500,
+          "Type": "Consul",
+          "ConfigurationKey": "consul-mobile"
+        },
+        "LoadBalancerOptions": {
+          "Type": "LeastConnection",
+          "Key": "mobile-loadbalancer",
+          "Expiry": 5000
+        },
+        "QoSOptions": {
+          "ExceptionsAllowedBeforeBreaking": 3,
+          "DurationOfBreak": 1000,
+          "TimeoutValue": 5000
+        }
+      }
+    }
+  ocelot.orders.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/orders/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/orders-api/orders/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "orders.read"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "orders-api"
+        },
+        {
+          "DownstreamPathTemplate": "/orders/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/orders-api/orders/{catchAll}",
+          "UpstreamHttpMethod": ["Put", "Patch", "Delete"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "orders.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "orders-api"
+        },
+        {
+          "DownstreamPathTemplate": "/orders",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/orders-api/orders",
+          "UpstreamHttpMethod": ["Post"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "orders.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "orders-api"
+        },
+        {
+          "DownstreamPathTemplate": "/deliveries/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/orders-api/deliveries/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "deliveries.read"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "orders-api"
+        },
+        {
+          "DownstreamPathTemplate": "/deliveries/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/orders-api/deliveries/{catchAll}",
+          "UpstreamHttpMethod": ["Post", "Put", "Patch", "Delete"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "deliveries.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "orders-api"
+        }
+      ]
+    }
+  ocelot.ratings.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/ratings-api/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "ratings.read"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "ratings-api"
+        },
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/ratings-api/{catchAll}",
+          "UpstreamHttpMethod": ["Post"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "ratings.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "ratings-api"
+        }
+      ]
+    }
+  ocelot.security.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/connect/token",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/security-api/connect/token",
+          "UpstreamHttpMethod": ["Post"],
+          "ServiceName": "security-api"
+        },
+        {
+          "DownstreamPathTemplate": "/.well-known/openid-configuration",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/security-api/.well-known/openid-configuration",
+          "UpstreamHttpMethod": ["Get"],
+          "ServiceName": "security-api"
+        },
+        {
+          "DownstreamPathTemplate": "/users/{role}/register",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/security-api/users/{role}/register",
+          "UpstreamHttpMethod": ["Post"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security",
+            "AllowedScopes": ["orders.write", "deliveries.write"]
+          },
+          "ServiceName": "security-api"
+        },
+        {
+          "DownstreamPathTemplate": "/users",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/security-api/users",
+          "UpstreamHttpMethod": ["Patch"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security",
+            "AllowedScopes": ["users.update"]
+          },
+          "ServiceName": "security-api"
+        },
+        {
+          "DownstreamPathTemplate": "/users/{userName}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/security-api/users/{userName}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security",
+            "AllowedScopes": ["users.read"]
+          },
+          "ServiceName": "security-api"
+        }
+      ]
+    }
+  ocelot.store.json: |
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/store-api/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "store.read"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "store-api"
+        },
+        {
+          "DownstreamPathTemplate": "/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/store-api/{catchAll}",
+          "UpstreamHttpMethod": ["Post", "Put", "Delete"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "store.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "store-api"
+        }
+      ]
+    }
+  ocelot.vehicles.json: | 
+    {
+      "Routes": [
+        {
+          "DownstreamPathTemplate": "/vehicles/{catchAll}",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/vehicles-api/vehicles/{catchAll}",
+          "UpstreamHttpMethod": ["Get"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "vehicles.read"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "vehicles-api"
+        },
+        {
+          "DownstreamPathTemplate": "/vehicles/",
+          "DownstreamScheme": "http",
+          "UpstreamPathTemplate": "/vehicles-api/vehicles/",
+          "UpstreamHttpMethod": ["Post", "Put", "Delete"],
+          "RouteClaimsRequirement": {
+            "client_id": "mobile-app",
+            "permissions": "vehicles.write"
+          },
+          "AuthenticationOptions": {
+            "AuthenticationProviderKey": "devkit-security"
+          },
+          "ServiceName": "vehicles-api"
+        }
+      ]
+    }

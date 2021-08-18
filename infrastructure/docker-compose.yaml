@@ -1,0 +1,137 @@
+version: "3.5"
+
+services:
+
+  devkit.consul:
+    image: consul:1.9.1
+    container_name: devkit.consul
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - "8500:8500"
+    command: consul agent -dev -log-level=warn -ui -client=0.0.0.0
+
+  devkit.portainer:
+    image: portainer/portainer:1.24.1-alpine
+    container_name: devkit.portainer
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - "9000:9000"
+    volumes:
+      - devkit-portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  devkit.rabbitmq:
+    image: rabbitmq:3.8.11-management-alpine
+    container_name: devkit.rabbitmq
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - "15672:15672"
+    volumes:
+      - devkit-rabbitmq:/var/lib/rabbitmq/mnesia
+
+  devkit.mongoclient:
+    image: mongoclient/mongoclient:4.0.0
+    container_name: devkit.mongoclient
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - "3000:3000"
+    volumes:
+      - devkit-mongoclient:/data/db mongoclient/mongoclient
+     
+  devkit.elasticsearch:
+    image: elasticsearch:7.8.1
+    container_name: devkit.elasticsearch
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - 9200:9200
+    volumes:
+      - devkit-elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      - xpack.monitoring.enabled=true
+      - xpack.watcher.enabled=true
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ELASTIC_VERSION=7.10.1
+      - ELASTIC_SECURITY=true
+      - ELASTIC_PASSWORD=Passw0rd123$$
+    
+  devkit.kibana:
+    image: kibana:7.8.1
+    container_name: devkit.kibana
+    restart: unless-stopped
+    depends_on:
+      - devkit.elasticsearch
+    networks:
+      - devkit.net    
+    ports:
+      - 5601:5601
+    environment:
+      - xpack.encryptedSavedObjects.encryptionKey=00cc30e723064f4791eb54756b12a06e
+      - xpack.fleet.agents.tlsCheckDisabled:true
+      - xpack.security.enabled:true
+      - ELASTICSEARCH_HOSTS=http://devkit.elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=Passw0rd123$$
+
+  devkit.redisinsight:
+    image: redislabs/redisinsight:latest
+    container_name: devkit.redisinsight
+    restart: unless-stopped
+    networks:
+      - devkit.net 
+    ports:
+      - 6380:8001
+    volumes:
+      - devkit-redisinsight:/data
+    
+  devkit.redis.chatr:
+    image: bitnami/redis:6.0.9
+    container_name: devkit.redis.chatr
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - 6381:6379
+    volumes:
+      - devkit-redis.chatr:/data
+    environment:
+      - REDIS_PASSWORD=Passw0rd123$$
+    
+  devkit.redis.cache:
+    image: bitnami/redis:6.0.9
+    container_name: devkit.redis.cache
+    restart: unless-stopped
+    networks:
+      - devkit.net
+    ports:
+      - 6382:6379
+    volumes:
+      - devkit-redis.cache:/data
+    environment:
+      - REDIS_PASSWORD=Passw0rd123$$
+
+networks:
+  devkit.net:
+    driver: bridge
+    
+volumes:
+  devkit-mongoclient:
+  devkit-rabbitmq:
+  devkit-elk:
+  devkit-portainer:
+  devkit-elasticsearch:
+  devkit-redisinsight:
+  devkit-redis.chatr:
+  devkit-redis.cache:

@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Configurations>Debug;Release;Test</Configurations>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="Business\Deliveries\Commands\UpdateSpecialInstructions\**" />
+        <Compile Remove="Business\Orders\Queries\GetMyOrder\**" />
+        <EmbeddedResource Remove="Business\Deliveries\Commands\UpdateSpecialInstructions\**" />
+        <EmbeddedResource Remove="Business\Orders\Queries\GetMyOrder\**" />
+        <None Remove="Business\Deliveries\Commands\UpdateSpecialInstructions\**" />
+        <None Remove="Business\Orders\Queries\GetMyOrder\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\apps\core\api\communication\Devkit.Communication.FileStore.Fakes\Devkit.Communication.FileStore.Fakes.csproj" />
+        <ProjectReference Include="..\..\apps\core\api\communication\Devkit.Communication.Security.Fakes\Devkit.Communication.Security.Fakes.csproj" />
+        <ProjectReference Include="..\..\apps\core\sdk\test\Devkit.Test\Devkit.Test.csproj" />
+        <ProjectReference Include="..\..\apps\logistics-app\communication\Logistics.Communication.Store.Fakes\Logistics.Communication.Store.Fakes.csproj" />
+        <ProjectReference Include="..\..\apps\logistics-app\domain\order\Logistics.Orders.API\Logistics.Orders.API.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>

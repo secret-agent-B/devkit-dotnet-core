@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: logistics-base-ns
+  name: rabbitmq-deploy
+  labels:
+    name: rabbitmq-deploy
+    app: logistics-app
+    tier: base
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: rabbitmq-pod
+      app: logistics-app
+      tier: base
+  template:
+    metadata:
+      namespace: logistics-base-ns
+      name: rabbitmq-pod
+      labels: 
+        name: rabbitmq-pod
+        app: logistics-app
+        tier: base
+    spec:
+      containers: 
+        - name: rabbitmq
+          image: rabbitmq:3.8.2-management-alpine
+          ports:
+            - containerPort: 15672

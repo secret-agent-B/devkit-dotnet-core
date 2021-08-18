@@ -1,0 +1,32 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/store-api/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "store.read"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "store-api"
+    },
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/store-api/{catchAll}",
+      "UpstreamHttpMethod": ["Post", "Put", "Delete"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "store.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "store-api"
+    }
+  ]
+}

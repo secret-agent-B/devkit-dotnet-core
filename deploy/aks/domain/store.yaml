@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: store-deployment
+  labels:
+    app: snappy
+    name: store-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: store-pod
+  template: 
+    metadata:
+      name: store-pod
+      labels:
+        app: snappy
+        name: store-pod
+
+    spec:
+      containers:
+      - name: store
+        image: snappy.azurecr.io/logistics-store:#{Build.BuildId}#
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports: 
+          - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: envvar-configmap
+        - secretRef:
+            name: api-secrets
+        - secretRef:
+            name: store-secrets
+        volumeMounts:
+        - mountPath: app/infrastructure
+          name: base-settings
+        - mountPath: app/configs
+          name: store-settings
+      volumes:
+      - name: store-settings
+        configMap:
+          name: store-settings-configmap
+      - name: base-settings
+        configMap: 
+          name: base-settings-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: store-cluterip
+  labels:
+    app: snappy
+    name: store-cluterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: store-pod
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: store-settings-configmap
+data:
+  appsettings.json: |-
+    {
+      "AllowedHosts": "*",
+      "APIDefinition": {
+        "Name": "Logistics store API",
+        "Description": "API that stores and processes store information.",
+        "Version": "v1"
+      },
+      "ConsulConfiguration": {
+        "ConsulHost": "http://consul-clusterip:8500",
+        "ServiceName": "store-api",
+        "DataCenter": "dc1",
+        "ServiceId": "logistics.store",
+        "Port": "80",
+        "Tags": [
+          "logistics",
+          "store",
+          "internal"
+        ],
+        "Meta": {
+          "version": "1.0.0",
+          "sdk": "logistics",
+          "type": "domain",
+          "domain": "store"
+        }
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: store-secrets
+  labels:
+    app: snappy
+    name: store-secrets
+
+data:
+  RepositoryOptions__DatabaseName: c3RvcmU=
+  RepositoryOptions__ConnectionString: bW9uZ29kYitzcnY6Ly9zbmFwcHktdGVzdDpQYXNzdzByZDEyMyUyNC10ZXN0QHNuYXBweWNsdXN0ZXIuY2dkcjIubW9uZ29kYi5uZXQvc3RvcmU/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5

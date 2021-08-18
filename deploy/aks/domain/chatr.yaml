@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: chatr-deployment
+  labels:
+    app: snappy
+    name: chatr-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: chatr-pod
+  template: 
+    metadata:
+      name: chatr-pod
+      labels:
+        app: snappy
+        name: chatr-pod
+
+    spec:
+      containers:
+      - name: chatr
+        image: snappy.azurecr.io/devkit-chatr:#{Build.BuildId}#
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports: 
+          - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: envvar-configmap
+        - secretRef:
+            name: api-secrets
+        - secretRef:
+            name: chatr-secrets
+        volumeMounts:
+        - mountPath: app/infrastructure
+          name: base-settings
+        - mountPath: app/configs
+          name: chatr-settings
+      volumes:
+      - name: chatr-settings
+        configMap:
+          name: chatr-settings-configmap
+      - name: base-settings
+        configMap: 
+          name: base-settings-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: chatr-cluterip
+  labels:
+    app: snappy
+    name: chatr-cluterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: chatr-pod
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chatr-settings-configmap
+data:
+  appsettings.json: |-
+    {
+      "AllowedHosts": "*",
+      "APIDefinition": {
+        "Name": "Devkit ChatR API",
+        "Description": "ChatR API enables chatting within the app.",
+        "Version": "v1"
+      },
+      "ConsulConfiguration": {
+        "ConsulHost": "http://consul-clusterip:8500",
+        "ServiceName": "chatr-api",
+        "DataCenter": "dc1",
+        "ServiceId": "devkit.chatr",
+        "Port": "80",
+        "Tags": [
+          "devkit",
+          "chatr",
+          "internal"
+        ],
+        "Meta": {
+          "version": "1.0.0",
+          "sdk": "devkit",
+          "type": "shared",
+          "domain": "chatr"
+        }
+      },
+      "RedisChatR": {
+        "AllowAdmin": true,
+        "Ssl": false,
+        "ConnectTimeout": 6000,
+        "ConnectRetry": 2,
+        "Database": 0,
+        "Hosts": [
+          {
+            "Host": "chatr-db-clusterip",
+            "Port": "6379"
+          }
+        ],
+        "MaxValueLength": 5000000,
+        "PoolSize": 5,
+        "KeyPrefix": ""
+      },
+      "ChatRConfiguration": {
+        "SystemName": "Snappy",
+        "SystemRole": "System",
+        "SupportPhoneNumber": "1-800-999-7777",
+        "SupportEmail": "support@snappy.com",
+        "WelcomeMessage": "Welcome and thank you for using Snappy!"
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: chatr-secrets
+  labels:
+    app: snappy
+    name: chatr-secrets
+
+data:
+  RedisChatR__Password: UGFzc3cwcmQxMjMk
+  RepositoryOptions__DatabaseName: Y2hhdHI=
+  RepositoryOptions__ConnectionString: bW9uZ29kYitzcnY6Ly9zbmFwcHktdGVzdDpQYXNzdzByZDEyMyUyNC10ZXN0QHNuYXBweWNsdXN0ZXIuY2dkcjIubW9uZ29kYi5uZXQvY2hhdHI/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5

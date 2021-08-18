@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <Configurations>Debug;Release;Test</Configurations>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\sdk\communication\Devkit.Http\Devkit.Http.csproj" />
+      <ProjectReference Include="..\..\..\..\sdk\webapi\Devkit.WebAPI\Devkit.WebAPI.csproj" />
+      <ProjectReference Include="..\..\Devkit.Payment\Devkit.Payment.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+</Project>

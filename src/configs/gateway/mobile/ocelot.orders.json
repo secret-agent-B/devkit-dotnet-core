@@ -1,0 +1,74 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/orders/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/orders-api/orders/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "orders.read"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "orders-api"
+    },
+    {
+      "DownstreamPathTemplate": "/orders/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/orders-api/orders/{catchAll}",
+      "UpstreamHttpMethod": ["Put", "Patch", "Delete"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "orders.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "orders-api"
+    },
+    {
+      "DownstreamPathTemplate": "/orders",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/orders-api/orders",
+      "UpstreamHttpMethod": ["Post"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "orders.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "orders-api"
+    },
+    {
+      "DownstreamPathTemplate": "/deliveries/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/orders-api/deliveries/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "deliveries.read"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "orders-api"
+    },
+    {
+      "DownstreamPathTemplate": "/deliveries/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/orders-api/deliveries/{catchAll}",
+      "UpstreamHttpMethod": ["Post", "Put", "Patch", "Delete"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "deliveries.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "orders-api"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: kibana-configmaps
+  labels:
+    app: snappy
+    name: kibana-configmaps
+
+data:
+  ELASTICSEARCH_HOSTS: http://es-clusterip:9200
+  xpack.security.enabled: "true"
+  xpack.fleet.agents.tlsCheckDisabled: "true"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: kibana-secret
+  labels:
+    app: snappy
+    name: kibana-secret
+
+type: Opaque
+data:
+  # ELASTICSEARCH_PASSWORD: UGFzc3cwcmQxMjMk
+  ELASTICSEARCH_USERNAME: ZWxhc3RpYw==
+  ELASTICSEARCH_PASSWORD: UGFzc3cwcmQxMjMk
+  xpack.encryptedSavedObjects.encryptionKey: MDBjYzMwZTcyMzA2NGY0NzkxZWI1NDc1NmIxMmEwNmU=
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: kibana-deploy
+  labels:
+    app: snappy
+    name: kibana-deploy
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snappy
+      name: kibana-pod
+  template:
+    metadata:
+      namespace: devkit-ns
+      name: kibana-pod
+      labels:
+        app: snappy
+        name: kibana-pod
+
+    spec:
+      containers:
+      - name: kibana-pod
+        image: kibana:7.10.1
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        ports:
+        - containerPort: 5601
+        envFrom:
+          - configMapRef:
+              name: kibana-configmaps
+          - secretRef:
+              name: kibana-secret

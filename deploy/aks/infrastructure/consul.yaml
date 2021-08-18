@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: consul-deployment
+  labels:
+    app: snappy
+    name: consul-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snappy
+      name: consul-pod
+  template: 
+    metadata:
+      namespace: devkit-ns
+      name: consul-pod
+      labels:
+        app: snappy
+        name: consul-pod
+
+    spec:
+      containers:
+      - name: consul
+        image: consul:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "0.5"
+        ports: 
+          - containerPort: 8500
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: consul-clusterip
+  labels:
+    app: snappy
+    name: consul-clusterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: consul-pod
+  ports:
+    - port: 8500
+      targetPort: 8500

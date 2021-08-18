@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: devkit-ns
+  name: chatr-db-pvc
+  labels:
+    app: snappy
+    name: chatr-db-pvc
+        
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests: 
+      storage: 500Mi
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: chatr-db-secrets
+  labels:
+    app: snappy
+    name: chatr-db-secrets
+
+data:
+  REDIS_PASSWORD: UGFzc3cwcmQxMjMk
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: chatr-db-deployment
+  labels:
+    app: snappy
+    name: chatr-db-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snappy
+      name: chatr-db-pod
+  template: 
+    metadata:
+      name: chatr-db-pod
+      labels:
+        app: snappy
+        name: chatr-db-pod
+
+    spec:
+      containers:
+      - name: chatr-db
+        image: bitnami/redis:latest
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "0.5"
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: chatr-db-volume
+        - mountPath: /redis-master
+          name: chatr-db-volume
+        ports: 
+          - containerPort: 6379
+        envFrom:
+          - secretRef:
+              name: chatr-db-secrets
+      volumes:
+        - name: chatr-db-volume
+          persistentVolumeClaim:
+            claimName: chatr-db-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: chatr-db-clusterip
+  labels:
+    app: snappy
+    name: chatr-db-clusterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: chatr-db-pod
+  ports:
+    - port: 6379
+      targetPort: 6379

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: logistics-api-ns
+  name: vehicles-deploy
+  labels:
+    name: vehicles-deploy
+    app: logistics-app
+    tier: api
+spec:
+  selector:
+    matchLabels:
+      name: vehicles-pod
+      app: logistics-app
+      tier: api
+  template:
+    metadata:
+      namespace: logistics-api-ns
+      name: vehicles-pod
+      labels:        
+        name: vehicles-pod
+        app: logistics-app
+        tier: api
+    spec:
+      containers:
+        - name: vehicles
+          image: logistics.vehicles:latest
+          ports:
+            - containerPort: 443
+
+      
+    

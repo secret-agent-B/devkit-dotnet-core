@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: devkit-ns
+  name: es-pvc
+  labels:
+    app: snappy
+    name: es-pvc
+        
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests: 
+      storage: 500Mi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: es-configmap
+  labels:
+    app: snappy
+    name: es-configmap
+
+data:
+  xpack.monitoring.enabled: "true"
+  xpack.watcher.enabled: "true"
+  xpack.security.enabled: "true"
+  xpack.security.authc.api_key.enabled: "true"
+  discovery.type: single-node
+  ES_JAVA_OPTS: -Xms512m -Xmx512m
+  ELASTIC_VERSION: 7.10.1
+  ELASTIC_SECURITY: "true"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: es-secret
+  labels:
+    app: snappy
+    name: es-secret
+
+type: Opaque
+data:
+  ELASTIC_PASSWORD: UGFzc3cwcmQxMjMk
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: es-deploy
+  labels:
+    app: snappy
+    name: es-deploy
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snappy
+      name: es-pod
+  template:
+    metadata:
+      namespace: devkit-ns
+      name: es-pod
+      labels:
+        app: snappy
+        name: es-pod
+        
+    spec:
+      containers:
+      - name: es-pod
+        image: elasticsearch:7.10.1
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        ports:
+        - containerPort: 9200
+        envFrom:
+          - configMapRef:
+              name: es-configmap
+          - secretRef:
+              name: es-secret
+        volumeMounts:
+          - mountPath: /bitnami/elasticsearch/data
+            name: es-volume
+      volumes:
+        - name: es-volume
+          persistentVolumeClaim:
+            claimName: es-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: es-clusterip
+  labels:
+    app: snappy
+    name: es-clusterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: es-pod
+  ports:
+    - port: 9200
+      targetPort: 9200

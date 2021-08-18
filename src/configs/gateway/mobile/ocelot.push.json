@@ -1,0 +1,16 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/{catchAll}",
+            "DownstreamScheme": "ws",
+            "UpstreamPathTemplate": "/push-api/{catchAll}",
+            "RouteClaimsRequirement": {
+                "client_id": "mobile-app"
+            },
+            "AuthenticationOptions": {
+                "AuthenticationProviderKey": "devkit-security"
+            },
+            "ServiceName": "push-api"
+        }
+    ]
+}

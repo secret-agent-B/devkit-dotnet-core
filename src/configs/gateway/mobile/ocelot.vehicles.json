@@ -1,0 +1,32 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/vehicles/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/vehicles-api/vehicles/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "vehicles.read"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "vehicles-api"
+    },
+    {
+      "DownstreamPathTemplate": "/vehicles/",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/vehicles-api/vehicles/",
+      "UpstreamHttpMethod": ["Post", "Put", "Delete"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "vehicles.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "vehicles-api"
+    }
+  ]
+}

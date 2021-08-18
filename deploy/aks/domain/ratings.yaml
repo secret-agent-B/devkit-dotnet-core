@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: devkit-ns
+  name: ratings-deployment
+  labels:
+    app: snappy
+    name: ratings-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ratings-pod
+  template: 
+    metadata:
+      name: ratings-pod
+      labels:
+        app: snappy
+        name: ratings-pod
+
+    spec:
+      containers:
+      - name: ratings
+        image: snappy.azurecr.io/devkit-ratings:#{Build.BuildId}#
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports: 
+          - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: envvar-configmap
+        - secretRef:
+            name: api-secrets
+        - secretRef:
+            name: ratings-secrets
+        volumeMounts:
+        - mountPath: app/infrastructure
+          name: base-settings
+        - mountPath: app/configs
+          name: ratings-settings
+      volumes:
+      - name: ratings-settings
+        configMap:
+          name: ratings-settings-configmap
+      - name: base-settings
+        configMap: 
+          name: base-settings-configmap
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: devkit-ns
+  name: ratings-cluterip
+  labels:
+    app: snappy
+    name: ratings-cluterip
+
+spec:
+  type: ClusterIP
+  selector:
+    app: snappy
+    name: ratings-pod
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ratings-settings-configmap
+data:
+  appsettings.json: |-
+    {
+      "AllowedHosts": "*",
+      "APIDefinition": {
+        "Name": "Devkit Ratings API",
+        "Description": "API for handling ratings.",
+        "Version": "v1"
+      },
+      "ConsulConfiguration": {
+        "ConsulHost": "http://consul-clusterip:8500",
+        "ServiceName": "ratings-api",
+        "DataCenter": "dc1",
+        "ServiceId": "devkit.ratings",
+        "Port": "80",
+        "Tags": [
+          "devkit",
+          "ratings",
+          "internal"
+        ],
+        "Meta": {
+          "version": "1.0.0",
+          "sdk": "devkit",
+          "type": "shared",
+          "domain": "ratings"
+        }
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: ratings-secrets
+  labels:
+    app: snappy
+    name: ratings-secrets
+
+data:
+  RepositoryOptions__DatabaseName: cmF0aW5ncw==
+  RepositoryOptions__ConnectionString: bW9uZ29kYitzcnY6Ly9zbmFwcHktdGVzdDpQYXNzdzByZDEyMyUyNC10ZXN0QHNuYXBweWNsdXN0ZXIuY2dkcjIubW9uZ29kYi5uZXQvcmF0aW5ncz9yZXRyeVdyaXRlcz10cnVlJnc9bWFqb3JpdHk=

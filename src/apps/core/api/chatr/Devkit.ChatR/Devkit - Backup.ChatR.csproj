@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<UserSecretsId>0e14a381-184b-41a4-9b18-5ad546bac50c</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..\..\..\..</DockerfileContext>
+		<Configurations>Debug;Release;Test</Configurations>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Controllers\**" />
+	  <Content Remove="Controllers\**" />
+	  <EmbeddedResource Remove="Controllers\**" />
+	  <None Remove="Controllers\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\sdk\webapi\Devkit.WebAPI\Devkit.WebAPI.csproj" />
+		<ProjectReference Include="..\..\communication\Devkit.Communication.ChatR\Devkit.Communication.ChatR.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+	  <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Business\Sessions - Copy\" />
+	  <Folder Include="Business\Sessions\" />
+	</ItemGroup>
+</Project>

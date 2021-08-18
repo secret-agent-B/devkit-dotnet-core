@@ -1,0 +1,32 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/ratings-api/{catchAll}",
+      "UpstreamHttpMethod": ["Get"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "ratings.read"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "ratings-api"
+    },
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "http",
+      "UpstreamPathTemplate": "/ratings-api/{catchAll}",
+      "UpstreamHttpMethod": ["Post"],
+      "RouteClaimsRequirement": {
+        "client_id": "mobile-app",
+        "permissions": "ratings.write"
+      },
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "devkit-security"
+      },
+      "ServiceName": "ratings-api"
+    }
+  ]
+}

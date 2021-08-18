@@ -1,0 +1,176 @@
+version: '3.4'
+
+services:
+
+  devkit.gateway:
+    image: snappy/devkit-gateway:latest
+    build:
+      context: .
+      dockerfile: apps/core/api/gateway/Devkit.Gateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=44301
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - DEVKIT_GATEWAY_TYPE=mobile
+      - OCELOT_CONFIG_PATH=/app/configs/
+      - ENABLE_SERVICE_REGISTRY=true
+      - ENABLE_SWAGGER=true
+      - LOG_INDEX=devkit.gateway
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8001:80"
+      - "44301:443"
+    volumes:
+      - ./configs/gateway:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+
+  devkit.security:
+    image: snappy/devkit-security:latest
+    build:
+      context: .
+      dockerfile: apps/core/api/security/Devkit.Security/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=;http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=devkit.security
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+      ###############################################
+      # Add 3rd party authentication provider info. #
+      ###############################################
+      - "GOOGLE_CLIENT_ID=Add Google client id"
+      - "GOOGLE_SECRET=Add Google secret"
+      - "FACEBOOK_CLIENT_ID=Add Facebook client id"
+      - "FACEBOOK_SECRET=Add Facebook secret"
+    ports:
+      - "8002:80"
+    volumes:
+      - ./configs/services/security-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+
+  devkit.file-store:
+    image: snappy/devkit-file-store:latest
+    build:
+      context: .
+      dockerfile: apps/core/api/file-store/Devkit.FileStore/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=devkit.file-store
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8003:80"
+    volumes:
+      - ./configs/services/file-store-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+
+  devkit.chatr:
+    image: snappy/devkit-chatr:latest
+    build:
+      context: .
+      dockerfile: apps/core/api/chatr/Devkit.ChatR/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=devkit.file-store
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+      ###############################################
+      # Redis configuration info.                   #
+      ###############################################
+      - REDIS_ENDPOINTS=devkit.redis.chatr:6379
+      - REDIS_PASSWORD=Passw0rd123$$
+    ports:
+      - "8004:80"
+    volumes:
+      - ./configs/services/chatr-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+
+  devkit.ratings:
+    image: snappy/devkit-ratings:latest
+    build:
+      context: .
+      dockerfile: apps/core/api/rating/Devkit.Ratings/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=devkit.ratings
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8005:80"
+    volumes:
+      - ./configs/services/ratings-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+    
+  logistics.orders:
+    image: snappy/logistics-orders:latest
+    build:
+      context: .
+      dockerfile: apps/logistics-app/domain/order/Logistics.Orders.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=logistics.orders
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8011:80"
+    volumes:
+      - ./configs/services/orders-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+    
+  logistics.store:
+    image: snappy/logistics-store:latest
+    build:
+      context: .
+      dockerfile: apps/logistics-app/domain/store/Logistics.Store.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=logistics.store
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8012:80"
+    volumes:
+      - ./configs/services/store-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+    
+  logistics.vehicles:
+    image: snappy/logistics-vehicles:latest
+    build:
+      context: .
+      dockerfile: apps/logistics-app/domain/vehicle/Logistics.Vehicles.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ENABLE_SWAGGER=true
+      - ENABLE_SERVICE_REGISTRY=true
+      - LOG_INDEX=logistics.vehicles
+      - LOG_SINK=elk
+      - SERVICE_BUS_TYPE=amqp
+    ports:
+      - "8013:80"
+    volumes:
+      - ./configs/services/vehicles-api/:/app/configs:ro
+      - ./configs/infrastructure/:/app/infrastructure:ro
+
+networks:
+  default:
+    external:
+      name: base_devkit.net

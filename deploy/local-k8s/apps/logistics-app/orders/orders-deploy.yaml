@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: snappy
+  name: orders-deploy
+  labels:
+    name: orders-deploy
+    app: snappy-app
+    tier: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: orders-pod
+      app: snappy-app
+      tier: api
+  template:
+    metadata:
+      namespace: devkit-ns
+      name: orders-pod
+      labels:
+        name: orders-pod
+        app: snappy-app
+        tier: api
+    spec:
+      containers:
+        - name: orders
+          image: logistics.orders:latest
+          ports:
+            - containerPort: 443
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Test"
+            - name: ASPNETCORE_HTTPS_PORT
+              value: "443"
+            - name: ASPNETCORE_URLS
+              value: "https://+:443;http://+:80"
+            - name: ENABLE_SWAGGER
+              value: "false"
+            - name: ENABLE_SERVICE_REGISTRY
+              value: "false"
+            - name: LOG_INDEX
+              value: "logistics.orders"
+            - name: LOG_SINK
+              value: "elk"
+            - name: SERVICE_BUS_TYPE
+              value: "amqp"

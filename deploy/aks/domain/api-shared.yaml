@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: devkit-ns
+  name: api-secrets
+  labels:
+    app: snappy
+    name: api-secrets
+
+data:
+  ServiceBusConfiguration__Username: Z3Vlc3QK
+  ServiceBusConfiguration__Password: UGFzc3cwcmQxMjMk
+  ElasticsearchConfiguration__Username: ZWxhc3RpYw==
+  ElasticsearchConfiguration__Password: UGFzc3cwcmQxMjMk
+--- 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: base-settings-configmap
+  labels:
+    app: snappy
+    name: devkit-ns
+
+data:
+  # json settings
+  log-elk.Test.json: |
+    {
+      "Serilog": {
+        "Using": ["Serilog.Sinks.Console", "Serilog.Sinks.ElasticSearch"],
+        "MinimumLevel": "Information",
+        "Properties": {
+          "Application": "Logistics App"
+        }
+      },
+      "ElasticsearchConfiguration": {
+        "Uri": "http://es-clusterip:9200",
+        "UserName": "",
+        "Password": ""
+      }
+    }
+
+  log-console.Test.json: |
+    {
+      "Serilog": {
+        "Using": ["Serilog.Sinks.Console"],
+        "MinimumLevel": "Information",
+        "Properties": {
+          "Application": "Logistics App"
+        }
+      }
+    }
+
+  bus-amqp.Test.json: |
+    {
+      "ServiceBusConfiguration": {
+        "Heartbeat": 30,
+        "Host": "rabbitmq-clusterip",
+        "Port": 5672,
+        "Username": "",
+        "Password": ""
+      }
+    }
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: devkit-ns
+  name: envvar-configmap
+  labels:
+    app: snappy
+    name: envvar-configmap
+
+data:
+  ASPNETCORE_ENVIRONMENT: Test
+  ASPNETCORE_URLS: http://+:80
+  ENABLE_SWAGGER: "true"
+  ENABLE_SERVICE_REGISTRY: "true"
+  LOG_SINK: elk
+  SERVICE_BUS_TYPE: amqp
