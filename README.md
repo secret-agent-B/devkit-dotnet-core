@@ -219,7 +219,7 @@ public class FakeGetUserConsumer : Devkit.ServiceBus.Test.FakeMessageConsumerBas
 }
 ```
 
-Register the fake registry into DI like the example below. When your handler sends a `Request` for data through the service bus, the fake consumer registered within the fake registry will respond to the request.
+Register the fake registry into DI like the example below. When your handler sends a `Request` for data through the service bus, the fake consumer registered within the fake registry will respond to the request. I usually create one IntegrationBase class per project so that I can just resuse my setup to test different endpoints.
 
 ```c#
 public abstract class OrdersIntegrationTestBase<TRequest> : Devkit.Test.IntegrationTestBase<TRequest, Logistics.Orders.API.Startup>
