@@ -183,3 +183,18 @@ namespace Devkit.Security.ServiceBus
 ```
 
 ### Testing with Service Bus
+
+I rely heavily on `MassTransit`'s `InMemoryTestHarness` for testing. With unit test you basically just new up an instance of an `InMemoryTestHarness` then add the consumer call the `Start` method.
+
+```c#
+this.TestHarness = new InMemoryTestHarness();
+this.TestHarness.Consumer<FakeGetUserConsumer>();
+this.TestHarness.Start().Wait();
+
+// Pass the IBus within the test harness, it's where messages will be sent to.
+var mediatRHandler = new CreateOrderHandler(this.Repository, this.TestHarness.Bus);
+mediatRHandler.Handle(command, CancellationToken.None);
+
+// Check the messages to confirm that we published the event.
+Assert.True(await this.TestHarness.Published.Any<IOrderCreated>());
+```
