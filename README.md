@@ -87,7 +87,7 @@ It is very easy to get a service up and running using the framework, reference t
 
 ### Service Bus
 
-This feature provides messaging between microservices with [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/). Not gonna dive into as to why I picked AMQP vs HTTP for internal messaging you can still use libraries like [Refit](https://github.com/reactiveui/refit) if you prefer to go that route.
+This feature provides messaging between microservices with [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/). **MassTransit** is by far the easiest and intuitive message queue library to use out there for C#. I'm not gonna dive into as to why I picked AMQP vs HTTP for internal messaging you can still use libraries like [Refit](https://github.com/reactiveui/refit) if you prefer to go that route.
 
 To setup messaging you need to create the messages or events that you can send and receive between microservices. I usually just create a new project per microservice or domain. Example, within the Devkit solution you will see a project named `Logistics.Communication.Orders`. This project contains 2 folders `DTOs` and `Messages` that are related to orders.
 
@@ -160,6 +160,10 @@ namespace Devkit.Security.ServiceBus.Consumers
 }
 ```
 
+Notice that we send anonymous types back using `RespondAsync<TResponse>`. You might be wondering what the heck would happen if someone changed the contract/interface? This is where `MassTransit.Analyzers` come in, `Devkit.ServiceBus` library comes with this library that will help identify anonymous types being sent or published through `MassTransit` that does not agree with the interface.
+
+![MassTransit.Analyzer warning](/docs/images/mt-analyzer-warning.png)
+
 To wire up the consumers we will use `MassTransit`'s `IServiceCollectionBusConfigurator` and its extension method `AddConsumersFromNamespaceContaining<T>`. Using the `AddConsumersFromNamespaceContaining` method, pass in one of your consumers. This will add all the consumer in the same or deeper namespace.
 
 ```c#
@@ -177,3 +181,5 @@ namespace Devkit.Security.ServiceBus
     }
 }
 ```
+
+### Testing with Service Bus

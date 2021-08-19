@@ -33,7 +33,6 @@ namespace Devkit.Communication.Security.Fakes.Consumers
             {
                 this.Faker.Person.FirstName,
                 this.Faker.Person.LastName,
-                context.Message.UserName,
                 PhoneNumber = this.Faker.Phone.PhoneNumber()
             });
         }
