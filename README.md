@@ -83,6 +83,8 @@ It is very easy to get a service up and running using the framework, reference t
 
 ### Add other APIs here...
 
+---
+
 ## How Tos
 
 ### Service Bus
@@ -182,7 +184,7 @@ namespace Devkit.Security.ServiceBus
 }
 ```
 
-### Testing with Service Bus
+#### Testing with Service Bus (Unit Test)
 
 I rely heavily on `MassTransit`'s `InMemoryTestHarness` for testing. With unit test you basically just new up an instance of an `InMemoryTestHarness` then add the consumer call the `Start` method.
 
@@ -197,4 +199,51 @@ mediatRHandler.Handle(command, CancellationToken.None);
 
 // Check the messages to confirm that we published the event.
 Assert.True(await this.TestHarness.Published.Any<IOrderCreated>());
+```
+
+#### Testing with Service Bus using IClassFixture<AppTestFixture<TStartup>>
+
+The `Devkit.Test` project contains a base class called `IntegrationTestBase<TSUT, TStartup>` where TSUT is the command or query that is being tested, and TStartup is the Startup class that will help us spin up your service to send HTTP requests to test the entire flow; from the controller all the way to the command or query handler and so on. With this setup you can test to make sure that the messages are being sent out and the data that needs to be sent out are all in place.
+
+In some microservice, you will need to register fake consumers to respond to `Requests`. Below is a fake registry that adds a fake consumer that responds with bogus values
+
+```c#
+public class TestOrdersBusRegistry : IBusRegistry
+{
+    public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+    {
+        configurator.AddConsumer<FakeGetUserConsumer>();
+    }
+}
+
+public class FakeGetUserConsumer : Devkit.ServiceBus.Test.FakeMessageConsumerBase<IGetUser>
+{
+    protected async override Task ConsumeRequest(ConsumeContext<IGetUser> context)
+    {
+        await context.RespondAsync<IUserDTO>(new
+        {
+            this.Faker.Person.FirstName,
+            this.Faker.Person.LastName,
+            context.Message.UserName,
+            PhoneNumber = this.Faker.Phone.PhoneNumber()
+        });
+    }
+}
+```
+
+Register the fake registry into DI like the example below. When your handler sends a `Request` for data through the service bus, the fake consumer registered within the fake registry will respond to the request.
+
+```c#
+public abstract class OrdersIntegrationTestBase<TRequest> : Devkit.Test.IntegrationTestBase<TRequest, Logistics.Orders.API.Startup>
+{
+    protected OrdersIntegrationTestBase(AppTestFixture<Startup> testFixture)
+        : base(testFixture)
+    {
+        testFixture.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<IBusRegistry, TestOrdersBusRegistry>();
+        });
+    }
+    ...
+}
 ```
