@@ -79,7 +79,9 @@ Domain APIs are your own APIs that handles requests coming in from the `Gateway`
 
 ### Creating a new API
 
-It is very easy to get a service up and running using the framework, reference the `Devkit.WebAPI` project into your new .NET Core 5.0 Web API project. The `Devkit.WebAPI` framework references 3 Devkit projects, `Devkit.Patterns`, `Devkit.Metrics`, and `Devkit.ServiceBus`. `Devkit.Patterns` has wrapper classes for implementing the CQRS pattern with the `MediatR` library. `Devkit.Metrics` handles logging to `ElasticSearch`
+It is very easy to get a service up and running using the framework, reference the `Devkit.WebAPI` project into your new .NET Core 5.0 Web API project. The `Devkit.WebAPI` framework references 3 Devkit projects, `Devkit.Patterns`, `Devkit.Metrics`, and `Devkit.ServiceBus`. `Devkit.Patterns` has wrapper classes for implementing the CQRS pattern with the `MediatR` library. `Devkit.Metrics` handles logging to `ElasticSearch`.
+
+TODO: Cover support libraries here.
 
 ### Add other APIs here...
 
