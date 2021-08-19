@@ -97,18 +97,15 @@ To setup messaging you need to create the messages or events that you can send a
 
 ```c#
 // Example of an Event. This event is Published when a user successfully submitted an order.
-namespace Logistics.Communication.Orders.Messages.Events
+public interface IOrderSubmitted
 {
-    public interface IOrderSubmitted
-    {
-        string ClientUserName { get; }
+    string ClientUserName { get; }
 
-        int ProductId { get; }
+    int ProductId { get; }
 
-        double Price { get; }
+    double Price { get; }
 
-        ...
-    }
+    ...
 }
 ```
 
@@ -117,12 +114,9 @@ Messages can only be interfaces that implements `Devkit.ServiceBus.Interfaces.IR
 
 ```c#
 // Example of a Request. This is what you send to the bus to request for user information from microservice.
-namespace Devkit.Communication.Security.Messages
+public interface IGetUser : Devkit.ServiceBus.Interfaces.IRequest
 {
-    public interface IGetUser : Devkit.ServiceBus.Interfaces.IRequest
-    {
-        string UserName { get; set; }
-    }
+    string UserName { get; set; }
 }
 ```
 
@@ -130,33 +124,30 @@ To response to the `IGetUser` request you'll need to create a consumer class in 
 
 ```c#
 // Message consumer for IGetUser
-namespace Devkit.Security.ServiceBus.Consumers
+public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
 {
-    public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
+    protected async override Task ConsumeRequest(ConsumeContext<IGetUser> context)
     {
-        protected async override Task ConsumeRequest(ConsumeContext<IGetUser> context)
-        {
-            var user = await FindByNameAsync(context.Message.UserName);
+        var user = await FindByNameAsync(context.Message.UserName);
 
-            if (user == null)
+        if (user == null)
+        {
+            // send an error message back
+            await context.RespondAsync<IConsumerException>(new
             {
-                // send an error message back
-                await context.RespondAsync<IConsumerException>(new
-                {
-                    ErrorMessage = $"Could not find user by user name ({context.Message.UserName})"
-                });
-            }
-            else
+                ErrorMessage = $"Could not find user by user name ({context.Message.UserName})"
+            });
+        }
+        else
+        {
+            // send the user infromation back
+            await context.RespondAsync<IUserDTO>(new
             {
-                // send the user infromation back
-                await context.RespondAsync<IUserDTO>(new
-                {
-                    user.Profile.FirstName,
-                    user.Profile.LastName,
-                    user.UserName,
-                    user.PhoneNumber
-                });
-            }
+                user.Profile.FirstName,
+                user.Profile.LastName,
+                user.UserName,
+                user.PhoneNumber
+            });
         }
     }
 }
@@ -169,17 +160,14 @@ Notice that we send anonymous types back using `RespondAsync<TResponse>`. You mi
 To wire up the consumers we will use `MassTransit`'s `IServiceCollectionBusConfigurator` and its extension method `AddConsumersFromNamespaceContaining<T>`. Using the `AddConsumersFromNamespaceContaining` method, pass in one of your consumers. This will add all the consumer in the same or deeper namespace.
 
 ```c#
-namespace Devkit.Security.ServiceBus
-{
-    using MassTransit;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 
-    public class SecurityBusRegistry : Devkit.ServiceBus.Interfaces.IBusRegistry
+public class SecurityBusRegistry : Devkit.ServiceBus.Interfaces.IBusRegistry
+{
+    public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
     {
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
-        {
-            configurator.AddConsumersFromNamespaceContaining<GetUserConsumer>();
-        }
+        configurator.AddConsumersFromNamespaceContaining<GetUserConsumer>();
     }
 }
 ```
