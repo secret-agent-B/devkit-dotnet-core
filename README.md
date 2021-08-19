@@ -89,7 +89,7 @@ It is very easy to get a service up and running using the framework, reference t
 
 ### Service Bus
 
-This feature provides messaging between microservices with [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/). **MassTransit** is by far the easiest and intuitive message queue library to use out there for C#. I'm not gonna dive into as to why I picked AMQP vs HTTP for internal messaging you can still use libraries like [Refit](https://github.com/reactiveui/refit) if you prefer to go that route.
+This feature provides messaging between microservices with [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/). **MassTransit** is by far the easiest message queue library to use out there for C#. I'm not gonna dive into as to why I picked AMQP vs HTTP for internal messaging you can still use libraries like [Refit](https://github.com/reactiveui/refit) if you prefer to go that route.
 
 To setup messaging you need to create the messages or events that you can send and receive between microservices. I usually just create a new project per microservice or domain. Example, within the Devkit solution you will see a project named `Logistics.Communication.Orders`. This project contains 2 folders `DTOs` and `Messages` that are related to orders.
 
