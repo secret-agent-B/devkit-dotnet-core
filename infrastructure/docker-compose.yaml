@@ -45,6 +45,15 @@ services:
       - "3000:3000"
     volumes:
       - devkit-mongoclient:/data/db mongoclient/mongoclient
+
+  devkit.mongo:
+    image: mongo
+    container_name: devkit.mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    networks:
+      - devkit.net
      
   devkit.elasticsearch:
     image: elasticsearch:7.8.1

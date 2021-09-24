@@ -4,6 +4,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System;
+
 namespace Devkit.Communication.Security.Fakes.Consumers
 {
     using System.Diagnostics.CodeAnalysis;
@@ -31,6 +33,7 @@ namespace Devkit.Communication.Security.Fakes.Consumers
         {
             await context.RespondAsync<IUserDTO>(new
             {
+                this.Faker.Person.UserName,
                 this.Faker.Person.FirstName,
                 this.Faker.Person.LastName,
                 PhoneNumber = this.Faker.Phone.PhoneNumber()

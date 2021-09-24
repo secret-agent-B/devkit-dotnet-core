@@ -20,7 +20,7 @@ services:
       - SERVICE_BUS_TYPE=amqp
     ports:
       - "8001:80"
-      - "44301:443"
+      - "5000:443"
     volumes:
       - ./configs/gateway:/app/configs:ro
       - ./configs/infrastructure/:/app/infrastructure:ro
@@ -173,4 +173,4 @@ services:
 networks:
   default:
     external:
-      name: base_devkit.net
+      name: infrastructure_devkit.net
