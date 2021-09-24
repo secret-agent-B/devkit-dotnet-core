@@ -1,6 +1,6 @@
 # Devkit Microservice Framework
 
-DMF if a framework for designing a microservice ecosystem in .NET Core 5. The ecosystem consists of 3 major parts; Gateway, Domain APIs, Support APIs, Infrastructure Services. DMF's goal is to minimize the time needed to setup a microservice ecosystem using .NET Core and to provide libraries that will help developers write clean and testable code.
+DMF provides a base framework for developing microservices using .NET Core. The framework provides security, consistent patterns with developing your API endpoints, service-to-service communication through AMQP, and helper libraries that will help with testing, etc. I use this for my personal projects to help speed up my prototyping or development.
 
 ![High Level Design](/docs/images/high-level.png)
 
