@@ -13,7 +13,7 @@ spec:
     matchLabels:
       app: snappy
       name: consul-pod
-  template: 
+  template:
     metadata:
       namespace: devkit-ns
       name: consul-pod
@@ -23,17 +23,16 @@ spec:
 
     spec:
       containers:
-      - name: consul
-        image: consul:latest
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "0.5"
-        ports: 
-          - containerPort: 8500
+        - name: consul
+          image: consul:latest
+          resources:
+            limits:
+              memory: '128Mi'
+              cpu: '1'
+          ports:
+            - containerPort: 8500
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

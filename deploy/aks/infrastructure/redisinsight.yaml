@@ -1,4 +1,3 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +13,7 @@ spec:
     matchLabels:
       app: snappy
       name: redisinsight-pod
-  template: 
+  template:
     metadata:
       namespace: devkit-ns
       name: redisinsight-pod
@@ -24,11 +23,11 @@ spec:
 
     spec:
       containers:
-      - name: redisinsight
-        image: redislabs/redisinsight:latest
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "0.5"
-        ports: 
-          - containerPort: 8001
+        - name: redisinsight
+          image: redislabs/redisinsight:latest
+          resources:
+            limits:
+              memory: '128Mi'
+              cpu: '1'
+          ports:
+            - containerPort: 8001

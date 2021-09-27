@@ -6,16 +6,15 @@ metadata:
   labels:
     app: snappy
     name: api-cache-pvc
-        
+
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
-    requests: 
+    requests:
       storage: 500Mi
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -29,7 +28,6 @@ data:
   REDIS_PASSWORD: UGFzc3cwcmQxMjMk
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,7 +43,7 @@ spec:
     matchLabels:
       app: snappy
       name: api-cache-pod
-  template: 
+  template:
     metadata:
       name: api-cache-pod
       labels:
@@ -54,29 +52,28 @@ spec:
 
     spec:
       containers:
-      - name: api-cache
-        image: bitnami/redis:latest
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "0.5"
-        volumeMounts:
-        - mountPath: /redis-master-data
-          name: api-cache-volume
-        - mountPath: /redis-master
-          name: api-cache-volume
-        ports: 
-          - containerPort: 6379
-        envFrom:
-          - secretRef:
-              name: api-cache-secrets
+        - name: api-cache
+          image: bitnami/redis:latest
+          resources:
+            limits:
+              memory: '256Mi'
+              cpu: '1'
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: api-cache-volume
+            - mountPath: /redis-master
+              name: api-cache-volume
+          ports:
+            - containerPort: 6379
+          envFrom:
+            - secretRef:
+                name: api-cache-secrets
       volumes:
         - name: api-cache-volume
           persistentVolumeClaim:
             claimName: api-cache-pvc
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

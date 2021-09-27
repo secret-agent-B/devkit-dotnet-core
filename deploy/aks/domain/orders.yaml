@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       name: orders-pod
-  template: 
+  template:
     metadata:
       name: orders-pod
       labels:
@@ -21,39 +21,38 @@ spec:
 
     spec:
       containers:
-      - name: orders
-        image: snappy.azurecr.io/logistics-orders:#{Build.BuildId}#
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "250m"
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-        ports: 
-          - containerPort: 80
-        envFrom:
-        - configMapRef:
-            name: envvar-configmap
-        - secretRef:
-            name: api-secrets
-        - secretRef:
-            name: orders-secrets
-        volumeMounts:
-        - mountPath: app/infrastructure
-          name: base-settings
-        - mountPath: app/configs
-          name: orders-settings
+        - name: orders
+          image: snappy.azurecr.io/logistics-orders:#{Build.BuildId}#
+          resources:
+            requests:
+              memory: '128Mi'
+              cpu: '1'
+            limits:
+              memory: '256Mi'
+              cpu: '1'
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: envvar-configmap
+            - secretRef:
+                name: api-secrets
+            - secretRef:
+                name: orders-secrets
+          volumeMounts:
+            - mountPath: app/infrastructure
+              name: base-settings
+            - mountPath: app/configs
+              name: orders-settings
       volumes:
-      - name: orders-settings
-        configMap:
-          name: orders-settings-configmap
-      - name: base-settings
-        configMap: 
-          name: base-settings-configmap
+        - name: orders-settings
+          configMap:
+            name: orders-settings-configmap
+        - name: base-settings
+          configMap:
+            name: base-settings-configmap
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -73,7 +72,6 @@ spec:
       targetPort: 80
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -118,7 +116,6 @@ data:
     }
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:

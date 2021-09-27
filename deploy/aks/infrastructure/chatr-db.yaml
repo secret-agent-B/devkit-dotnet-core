@@ -6,16 +6,15 @@ metadata:
   labels:
     app: snappy
     name: chatr-db-pvc
-        
+
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
-    requests: 
+    requests:
       storage: 500Mi
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -29,7 +28,6 @@ data:
   REDIS_PASSWORD: UGFzc3cwcmQxMjMk
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,7 +43,7 @@ spec:
     matchLabels:
       app: snappy
       name: chatr-db-pod
-  template: 
+  template:
     metadata:
       name: chatr-db-pod
       labels:
@@ -54,29 +52,28 @@ spec:
 
     spec:
       containers:
-      - name: chatr-db
-        image: bitnami/redis:latest
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "0.5"
-        volumeMounts:
-        - mountPath: /redis-master-data
-          name: chatr-db-volume
-        - mountPath: /redis-master
-          name: chatr-db-volume
-        ports: 
-          - containerPort: 6379
-        envFrom:
-          - secretRef:
-              name: chatr-db-secrets
+        - name: chatr-db
+          image: bitnami/redis:latest
+          resources:
+            limits:
+              memory: '256Mi'
+              cpu: '1'
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: chatr-db-volume
+            - mountPath: /redis-master
+              name: chatr-db-volume
+          ports:
+            - containerPort: 6379
+          envFrom:
+            - secretRef:
+                name: chatr-db-secrets
       volumes:
         - name: chatr-db-volume
           persistentVolumeClaim:
             claimName: chatr-db-pvc
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

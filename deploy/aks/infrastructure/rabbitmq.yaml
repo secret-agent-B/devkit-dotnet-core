@@ -6,16 +6,15 @@ metadata:
   labels:
     app: snappy
     name: rabbitmq-pvc
-        
+
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
-    requests: 
+    requests:
       storage: 500Mi
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -30,7 +29,6 @@ data:
   RABBITMQ_USERNAME: Z3Vlc3QK
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -46,7 +44,7 @@ spec:
     matchLabels:
       app: snappy
       name: rabbitmq-pod
-  template: 
+  template:
     metadata:
       namespace: devkit-ns
       name: rabbitmq-pod
@@ -56,25 +54,24 @@ spec:
 
     spec:
       containers:
-      - name: rabbitmq
-        image: rabbitmq:3.8.11-management-alpine
-        resources:
-          limits:
-            memory: "1Gi"
-            cpu: "0.5"
-        volumeMounts:
-        - mountPath: /var/lib/rabbitmq/mnesia
-          name: rabbitmq-storage          
-        ports: 
-          - containerPort: 15672
-          - containerPort: 5672
+        - name: rabbitmq
+          image: rabbitmq:3.8.11-management-alpine
+          resources:
+            limits:
+              memory: '1Gi'
+              cpu: '1'
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq/mnesia
+              name: rabbitmq-storage
+          ports:
+            - containerPort: 15672
+            - containerPort: 5672
       volumes:
         - name: rabbitmq-storage
           persistentVolumeClaim:
             claimName: rabbitmq-pvc
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -85,7 +82,7 @@ metadata:
     name: rabbitmq-clusterip
 
 spec:
-  type: ClusterIP 
+  type: ClusterIP
   selector:
     app: snappy
     name: rabbitmq-pod
