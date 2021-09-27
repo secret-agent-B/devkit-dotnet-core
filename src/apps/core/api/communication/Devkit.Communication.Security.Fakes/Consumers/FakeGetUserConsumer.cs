@@ -4,8 +4,6 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-
 namespace Devkit.Communication.Security.Fakes.Consumers
 {
     using System.Diagnostics.CodeAnalysis;
@@ -16,7 +14,7 @@ namespace Devkit.Communication.Security.Fakes.Consumers
     using MassTransit;
 
     /// <summary>
-    /// The GetUserConsumer.
+    /// The GetUserConsumer fake message consumer.
     /// </summary>
     /// <seealso cref="FakeMessageConsumerBase{IGetUser}" />
     public class FakeGetUserConsumer : FakeMessageConsumerBase<IGetUser>
@@ -33,9 +31,9 @@ namespace Devkit.Communication.Security.Fakes.Consumers
         {
             await context.RespondAsync<IUserDTO>(new
             {
-                this.Faker.Person.UserName,
                 this.Faker.Person.FirstName,
                 this.Faker.Person.LastName,
+                context.Message.UserName,
                 PhoneNumber = this.Faker.Phone.PhoneNumber()
             });
         }
