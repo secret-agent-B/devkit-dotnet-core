@@ -34,19 +34,14 @@ namespace Devkit.Security.Data
         private const int _secondsWithinADay = 86400;
 
         /// <summary>
-        /// The client permissions.
-        /// </summary>
-        private readonly List<string> _clientPermissions;
-
-        /// <summary>
-        /// The driver permissions.
-        /// </summary>
-        private readonly List<string> _driverPermissions;
-
-        /// <summary>
         /// The role manager.
         /// </summary>
         private readonly RoleManager<UserRole> _roleManager;
+
+        /// <summary>
+        /// The user permissions.
+        /// </summary>
+        private readonly List<string> _userPermissions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SecuritySeeder" /> class.
@@ -59,33 +54,16 @@ namespace Devkit.Security.Data
         {
             this._roleManager = roleManager;
 
-            this._driverPermissions = new List<string>
+            this._userPermissions = new List<string>
             {
-                "deliveries.read",
-                "deliveries.write",
+                "chat.read",
+                "chat.write",
                 "files.read",
                 "files.write",
-                "orders.read",
-                "orders.write",
                 "ratings.read",
                 "ratings.write",
                 "users.read",
                 "users.update",
-                "vehicles.read",
-                "vehicles.write",
-            };
-
-            this._clientPermissions = new List<string>
-            {
-                "files.read",
-                "files.write",
-                "orders.read",
-                "orders.write",
-                "ratings.read",
-                "ratings.write",
-                "users.read",
-                "users.update",
-                "vehicles.read"
             };
         }
 
@@ -117,14 +95,7 @@ namespace Devkit.Security.Data
 
             var adminClaims = await this._roleManager.GetClaimsAsync(administrator);
 
-            foreach (var permission in this._driverPermissions
-                .Where(permission => !adminClaims
-                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
-            {
-                await this._roleManager.AddClaimAsync(administrator, new Claim(permissionClaim, permission));
-            }
-
-            foreach (var permission in this._clientPermissions
+            foreach (var permission in this._userPermissions
                 .Where(permission => !adminClaims
                     .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
@@ -150,7 +121,7 @@ namespace Devkit.Security.Data
 
             var clientClaims = await this._roleManager.GetClaimsAsync(clientRole);
 
-            foreach (var permission in this._clientPermissions
+            foreach (var permission in this._userPermissions
                 .Where(permission => !clientClaims
                     .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
@@ -159,49 +130,19 @@ namespace Devkit.Security.Data
         }
 
         /// <summary>
-        /// Configures the driver role.
-        /// </summary>
-        /// <param name="driverRoleName">Name of the driver role.</param>
-        /// <param name="permissionClaim">The permission claim.</param>
-        private async Task ConfigureDriverRole(string driverRoleName, string permissionClaim)
-        {
-            // Driver role seed
-            var driverRole = await this._roleManager.FindByNameAsync(driverRoleName);
-
-            if (driverRole == null)
-            {
-                driverRole = new UserRole(driverRoleName);
-                await this._roleManager.CreateAsync(driverRole);
-            }
-
-            var driverClaims = await this._roleManager.GetClaimsAsync(driverRole);
-
-            foreach (var permission in this._driverPermissions
-                .Where(permission => !driverClaims
-                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
-            {
-                await this._roleManager.AddClaimAsync(driverRole, new Claim(permissionClaim, permission));
-            }
-        }
-
-        /// <summary>
-        /// Seeds the client configuration.
+        /// Seeds the user configuration.
         /// </summary>
         private void SeedClientConfiguration()
         {
             const string clientId = "mobile-app";
             const string clientSecret = "secret";
+
             const string apiGatewayName = "mobile-gateway";
             const string apiGatewayDisplayName = "Mobile Gateway";
 
             var apiGateway = new ApiResource(apiGatewayName, apiGatewayDisplayName);
 
-            foreach (var scope in this._driverPermissions)
-            {
-                apiGateway.Scopes.Add(scope);
-            }
-
-            foreach (var scope in this._clientPermissions)
+            foreach (var scope in this._userPermissions)
             {
                 apiGateway.Scopes.Add(scope);
             }
@@ -283,7 +224,6 @@ namespace Devkit.Security.Data
             const string adminRoleName = "Administrator";
             const string permissionClaim = "permissions";
 
-            await this.ConfigureDriverRole(driverRoleName, permissionClaim);
             await this.ConfigureClientRole(clientRoleName, permissionClaim);
             await this.ConfigureAdminRole(adminRoleName, permissionClaim);
         }
