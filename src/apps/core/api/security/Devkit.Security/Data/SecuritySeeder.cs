@@ -117,23 +117,17 @@ namespace Devkit.Security.Data
 
             var adminClaims = await this._roleManager.GetClaimsAsync(administrator);
 
-            foreach (var permission in this._driverPermissions)
+            foreach (var permission in this._driverPermissions
+                .Where(permission => !adminClaims
+                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
-                if (adminClaims.Any(x => x.Type == permissionClaim && x.Value == permission))
-                {
-                    continue;
-                }
-
                 await this._roleManager.AddClaimAsync(administrator, new Claim(permissionClaim, permission));
             }
 
-            foreach (var permission in this._clientPermissions)
+            foreach (var permission in this._clientPermissions
+                .Where(permission => !adminClaims
+                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
-                if (adminClaims.Any(x => x.Type == permissionClaim && x.Value == permission))
-                {
-                    continue;
-                }
-
                 await this._roleManager.AddClaimAsync(administrator, new Claim(permissionClaim, permission));
             }
         }
@@ -156,13 +150,10 @@ namespace Devkit.Security.Data
 
             var clientClaims = await this._roleManager.GetClaimsAsync(clientRole);
 
-            foreach (var permission in this._clientPermissions)
+            foreach (var permission in this._clientPermissions
+                .Where(permission => !clientClaims
+                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
-                if (clientClaims.Any(x => x.Type == permissionClaim && x.Value == permission))
-                {
-                    continue;
-                }
-
                 await this._roleManager.AddClaimAsync(clientRole, new Claim(permissionClaim, permission));
             }
         }
@@ -185,13 +176,10 @@ namespace Devkit.Security.Data
 
             var driverClaims = await this._roleManager.GetClaimsAsync(driverRole);
 
-            foreach (var permission in this._driverPermissions)
+            foreach (var permission in this._driverPermissions
+                .Where(permission => !driverClaims
+                    .Any(x => x.Type == permissionClaim && x.Value == permission)))
             {
-                if (driverClaims.Any(x => x.Type == permissionClaim && x.Value == permission))
-                {
-                    continue;
-                }
-
                 await this._roleManager.AddClaimAsync(driverRole, new Claim(permissionClaim, permission));
             }
         }
@@ -243,7 +231,7 @@ namespace Devkit.Security.Data
                 new IdentityResources.Email(),
                 new IdentityResources.Phone(),
                 new IdentityResources.Profile(),
-                new IdentityResource
+                new()
                 {
                     Name = "roles",
                     DisplayName = "Roles",
@@ -257,13 +245,10 @@ namespace Devkit.Security.Data
 
             var existingResources = this.Repository.All<IdentityResource>().ToList();
 
-            foreach (var identityResource in identityResources)
+            foreach (var identityResource in identityResources
+                .Where(identityResource => existingResources
+                    .All(x => x.Name != identityResource.Name)))
             {
-                if (existingResources.Any(x => x.Name == identityResource.Name))
-                {
-                    continue;
-                }
-
                 this.Repository.Add(identityResource);
             }
 
