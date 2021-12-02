@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>23d13947-262b-4e44-8002-0b2af3d089a7</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..\..\..\..</DockerfileContext>
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+        <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

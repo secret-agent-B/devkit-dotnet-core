@@ -17,6 +17,7 @@ namespace Devkit.Security.Test
     using Devkit.Test;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.DependencyInjection;
+    using MongoDB.Bson;
 
     /// <summary>
     /// Security API test base.
@@ -45,19 +46,22 @@ namespace Devkit.Security.Test
                     ConnectionString = testFixture.RepositoryConfiguration.ConnectionString
                 };
 
-                var userCollection = MongoUtil.FromConnectionString<UserAccount>(databaseOptions.ConnectionString, databaseOptions.UsersCollection);
-                var roleCollection = MongoUtil.FromConnectionString<UserRole>(databaseOptions.ConnectionString, databaseOptions.RolesCollection);
+                var options = new MongoIdentityOptions
+                {
+                    ConnectionString = databaseOptions.ConnectionString
+                };
+
+                var userCollection = MongoUtil.FromConnectionString<UserAccount>(options, databaseOptions.UsersCollection);
+                var roleCollection = MongoUtil.FromConnectionString<UserRole>(options, databaseOptions.RolesCollection);
 
                 services.AddSingleton(x => userCollection);
                 services.AddSingleton(x => roleCollection);
 
                 services.AddTransient<IUserStore<UserAccount>>(x =>
-                    new UserStore<UserAccount, UserRole>(
+                    new UserStore<UserAccount, UserRole, ObjectId>(
                         userCollection,
-                        new RoleStore<UserRole>(roleCollection),
-                        x.GetService<ILookupNormalizer>()));
-
-                services.AddTransient<IRoleStore<UserRole>>(x => new RoleStore<UserRole>(roleCollection));
+                        roleCollection,
+                        new IdentityErrorDescriber()));
 
                 services.AddSingleton<IBusRegistry, TestSecurityBusRegistry>();
             });

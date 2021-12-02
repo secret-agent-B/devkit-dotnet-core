@@ -6,6 +6,7 @@
 
 namespace Devkit.Data
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using MongoDB.Driver;
 
@@ -13,9 +14,21 @@ namespace Devkit.Data
     /// Mongo Db update exception.
     /// </summary>
     /// <seealso cref="MongoException" />
-    [SuppressMessage("Design", "CA1032:Implement standard exception constructors", Justification = "MongoException cannot take in 0 args.")]
-    public class UpdateException : MongoException
+    public class UpdateException : Exception
     {
+        /// <summary>
+        /// Error message.
+        /// </summary>
+        private const string errorMessage = "Failed to update record.";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateException"/> class.
+        /// </summary>
+        public UpdateException()
+            : base(errorMessage)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateException"/> class.
         /// </summary>
@@ -30,7 +43,7 @@ namespace Devkit.Data
         /// </summary>
         /// <param name="message">The error message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public UpdateException(string message, System.Exception innerException)
+        public UpdateException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

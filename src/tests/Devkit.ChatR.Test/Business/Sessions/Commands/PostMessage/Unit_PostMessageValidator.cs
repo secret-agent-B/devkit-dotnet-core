@@ -22,8 +22,12 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         [Fact(DisplayName = "Fails if message is empty")]
         public void Fail_if_message_is_empty()
         {
-            var validator = this.Build();
-            validator.ShouldHaveValidationErrorFor(x => x.Message, string.Empty);
+            var validator = this.Build()
+                .TestValidate(new PostMessageCommand
+                {
+                    Message = string.Empty
+                });
+            validator.ShouldHaveValidationErrorFor(x => x.Message);
         }
 
         /// <summary>
@@ -34,8 +38,19 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         {
             var validator = this.Build();
 
-            validator.ShouldHaveValidationErrorFor(x => x.ReplyTo, this.Faker.Random.Hexadecimal(23, string.Empty));
-            validator.ShouldHaveValidationErrorFor(x => x.ReplyTo, this.Faker.Random.AlphaNumeric(1));
+            validator
+                .TestValidate(new PostMessageCommand
+                {
+                    ReplyTo = this.Faker.Random.Hexadecimal(23, string.Empty)
+                })
+                .ShouldHaveValidationErrorFor(x => x.ReplyTo);
+
+            validator
+                .TestValidate(new PostMessageCommand
+                {
+                    ReplyTo = this.Faker.Random.AlphaNumeric(1)
+                })
+                .ShouldHaveValidationErrorFor(x => x.ReplyTo);
         }
 
         /// <summary>
@@ -44,8 +59,13 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         [Fact(DisplayName = "Fails if session id is empty")]
         public void Fail_if_session_id_is_empty()
         {
-            var validator = this.Build();
-            validator.ShouldHaveValidationErrorFor(x => x.SessionId, string.Empty);
+            var validator = this.Build()
+                .TestValidate(new PostMessageCommand
+                {
+                    SessionId = string.Empty
+                });
+
+            validator.ShouldHaveValidationErrorFor(x => x.SessionId);
         }
 
         /// <summary>
@@ -54,8 +74,13 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         [Fact(DisplayName = "Fails if username is empty")]
         public void Fail_if_username_is_empty()
         {
-            var validator = this.Build();
-            validator.ShouldHaveValidationErrorFor(x => x.UserName, string.Empty);
+            var validator = this.Build()
+                .TestValidate(new PostMessageCommand
+                {
+                    UserName = string.Empty
+                });
+
+            validator.ShouldHaveValidationErrorFor(x => x.UserName);
         }
 
         /// <summary>
@@ -64,12 +89,19 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         [Fact(DisplayName = "Passes if command is valid")]
         public void Pass_if_command_is_valid()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(new PostMessageCommand
+                {
+                    UserName = this.Faker.Person.Email,
+                    Message = this.Faker.Rant.Review(),
+                    ReplyTo = this.Faker.Random.Hexadecimal(24, string.Empty),
+                    SessionId = $"{this.Faker.Random.Hexadecimal(24, string.Empty)}_{this.Faker.Person.Email}",
+                });
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.UserName, this.Faker.Person.Email);
-            validator.ShouldNotHaveValidationErrorFor(x => x.Message, this.Faker.Rant.Review());
-            validator.ShouldNotHaveValidationErrorFor(x => x.ReplyTo, this.Faker.Random.Hexadecimal(24, string.Empty));
-            validator.ShouldNotHaveValidationErrorFor(x => x.SessionId, $"{this.Faker.Random.Hexadecimal(24, string.Empty)}_{this.Faker.Person.Email}");
+            validator.ShouldNotHaveValidationErrorFor(x => x.UserName);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Message);
+            validator.ShouldNotHaveValidationErrorFor(x => x.ReplyTo);
+            validator.ShouldNotHaveValidationErrorFor(x => x.SessionId);
         }
     }
 }
