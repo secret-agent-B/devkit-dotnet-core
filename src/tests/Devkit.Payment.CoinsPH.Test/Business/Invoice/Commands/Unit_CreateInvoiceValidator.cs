@@ -25,9 +25,14 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         [InlineData(-1.00)]
         public void Should_fail_if_amount_is_invalid(double amount)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new CreateInvoiceCommand
+                    {
+                        Amount = amount
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Amount, amount);
+            validator.ShouldHaveValidationErrorFor(x => x.Amount);
         }
 
         /// <summary>
@@ -39,9 +44,14 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         [InlineData(null)]
         public void Should_fail_if_currency_is_invalid(string currency)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new CreateInvoiceCommand
+                    {
+                        Currency = currency
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Currency, currency);
+            validator.ShouldHaveValidationErrorFor(x => x.Currency);
         }
 
         /// <summary>
@@ -53,9 +63,14 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         [InlineData(null)]
         public void Should_fail_if_transaction_id_is_missing(string transactionId)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new CreateInvoiceCommand
+                    {
+                        TransactionId = transactionId
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.TransactionId, transactionId);
+            validator.ShouldHaveValidationErrorFor(x => x.TransactionId);
         }
 
         /// <summary>
@@ -65,11 +80,11 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         public void Should_pass_if_command_is_valid()
         {
             var command = new CreateInvoiceCommandFaker().Generate();
-            var validator = this.Build();
+            var validator = this.Build().TestValidate(command);
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Amount, command);
-            validator.ShouldNotHaveValidationErrorFor(x => x.Currency, command);
-            validator.ShouldNotHaveValidationErrorFor(x => x.TransactionId, command);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Amount);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Currency);
+            validator.ShouldNotHaveValidationErrorFor(x => x.TransactionId);
         }
     }
 }

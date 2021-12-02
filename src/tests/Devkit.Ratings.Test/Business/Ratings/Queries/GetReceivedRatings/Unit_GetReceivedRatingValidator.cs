@@ -23,15 +23,15 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
         [Fact(DisplayName = "Fails if date ranges do not agree")]
         public void Fail_if_date_ranges_do_not_agree()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new GetReceivedRatingsQuery
+                    {
+                        StartDate = DateTime.UtcNow,
+                        EndDate = this.Faker.Date.Recent(5)
+                    });
 
-            var query = new GetReceivedRatingsQuery
-            {
-                StartDate = DateTime.UtcNow,
-                EndDate = this.Faker.Date.Recent(5)
-            };
-
-            validator.ShouldHaveValidationErrorFor(x => x.StartDate, query);
+            validator.ShouldHaveValidationErrorFor(x => x.StartDate);
         }
 
         /// <summary>
@@ -40,9 +40,14 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
         [Fact(DisplayName = "Fails if receiver name is invalid")]
         public void Fail_if_receiver_name_is_invalid()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new GetReceivedRatingsQuery
+                    {
+                        ReceiverUserName = string.Empty
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.ReceiverUserName, string.Empty);
+            validator.ShouldHaveValidationErrorFor(x => x.ReceiverUserName);
         }
 
         /// <summary>
@@ -51,15 +56,15 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
         [Fact(DisplayName = "Passes if date ranges agree")]
         public void Pass_if_date_ranges_agree()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new GetReceivedRatingsQuery
+                    {
+                        StartDate = this.Faker.Date.Recent(5),
+                        EndDate = DateTime.UtcNow
+                    });
 
-            var query = new GetReceivedRatingsQuery
-            {
-                StartDate = this.Faker.Date.Recent(5),
-                EndDate = DateTime.UtcNow
-            };
-
-            validator.ShouldNotHaveValidationErrorFor(x => x.StartDate, query);
+            validator.ShouldNotHaveValidationErrorFor(x => x.StartDate);
         }
 
         /// <summary>
@@ -68,10 +73,16 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
         [Fact(DisplayName = "Passes if receiver username is valid")]
         public void Pass_if_receiver_username_is_valid()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new GetReceivedRatingsQuery
+                    {
+                        ReceiverUserName = this.Faker.Person.Email,
+                        StartDate = this.Faker.Date.Recent(5),
+                        EndDate = DateTime.UtcNow
+                    });
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.ReceiverUserName, this.Faker.Person.Email);
-            validator.ShouldNotHaveValidationErrorFor(x => x.ReceiverUserName, this.Faker.Person.UserName);
+            validator.ShouldNotHaveValidationErrorFor(x => x.ReceiverUserName);
         }
     }
 }
