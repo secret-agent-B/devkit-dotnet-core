@@ -48,8 +48,9 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
                         It.IsAny<string>(),
                         It.IsAny<SessionVM>(),
                         It.IsAny<When>(),
-                        It.IsAny<CommandFlags>()))
-                    .ReturnsAsync((string key, SessionVM session, When when, CommandFlags commandFlags) =>
+                        It.IsAny<CommandFlags>(),
+                        It.IsAny<HashSet<string>>()))
+                    .ReturnsAsync((string key, SessionVM session, When when, CommandFlags commandFlags, HashSet<string> hashset) =>
                     {
                         cache.Add(key, session);
                         return true;

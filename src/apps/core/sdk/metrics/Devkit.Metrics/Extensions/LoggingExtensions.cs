@@ -14,7 +14,7 @@ namespace Devkit.Metrics.Extensions
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Newtonsoft.Json;
+    using System.Text.Json;
     using Serilog;
     using Serilog.Formatting.Elasticsearch;
     using Serilog.Sinks.Elasticsearch;
@@ -87,10 +87,6 @@ namespace Devkit.Metrics.Extensions
             var logIndex = Environment.GetEnvironmentVariable(logIndexKey) ?? Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-");
             var elasticConfig = configuration.GetSection(elasticsearchConfigurationKey).Get<ElasticsearchConfiguration>();
             var node = new Uri(elasticConfig.Uri);
-
-            Console.WriteLine(new String('-', 10));
-            Console.WriteLine(JsonConvert.SerializeObject(elasticConfig, Formatting.Indented));
-            Console.WriteLine(new String('-', 10));
 
             if (string.IsNullOrEmpty(elasticConfig.UserName) || string.IsNullOrEmpty(elasticConfig.Password))
             {

@@ -11,25 +11,26 @@ namespace Devkit.Security.Stores
     using AspNetCore.Identity.Mongo.Stores;
     using Devkit.Security.Data.Models;
     using Microsoft.AspNetCore.Identity;
+    using MongoDB.Bson;
     using MongoDB.Driver;
 
     /// <summary>
     /// The CustomUserStore provides additional functionality for pulling users form the database.
     /// </summary>
-    /// <seealso cref="UserStore{UserAccount, UserRole}" />
-    public class CustomUserStore : UserStore<UserAccount, UserRole>
+    /// <seealso cref="UserStore{UserAccount, UserRole, ObjectId}" />
+    public class CustomUserStore : UserStore<UserAccount, UserRole, ObjectId>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomUserStore"/> class.
         /// </summary>
         /// <param name="userCollection">The user collection.</param>
         /// <param name="roleStore">The role store.</param>
-        /// <param name="normalizer">The normalizer.</param>
+        /// <param name="describer">Identity error describer.</param>
         public CustomUserStore(
             IMongoCollection<UserAccount> userCollection,
-            IRoleStore<UserRole> roleStore,
-            ILookupNormalizer normalizer)
-            : base(userCollection, roleStore, normalizer)
+            IMongoCollection<UserRole> roleStore,
+            IdentityErrorDescriber describer)
+            : base(userCollection, roleStore, describer)
         {
         }
 

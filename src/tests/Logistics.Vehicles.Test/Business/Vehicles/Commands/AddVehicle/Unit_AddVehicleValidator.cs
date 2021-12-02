@@ -27,9 +27,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(null)]
         public void Fail_for_invalid_manufacturer(string manufacturer)
         {
-            var validator = this.Build();
-
-            validator.ShouldHaveValidationErrorFor(x => x.Manufacturer, manufacturer);
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Manufacturer = manufacturer 
+                    });
+            
+            validator.ShouldHaveValidationErrorFor(x => x.Manufacturer);
         }
 
         /// <summary>
@@ -41,9 +45,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(null)]
         public void Fail_for_invalid_model(string model)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Model = model
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Model, model);
+            validator.ShouldHaveValidationErrorFor(x => x.Model);
         }
 
         /// <summary>
@@ -55,9 +63,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(null)]
         public void Fail_for_invalid_ownerId(string ownerId)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        OwnerUserName = ownerId
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.OwnerUserName, ownerId);
+            validator.ShouldHaveValidationErrorFor(x => x.OwnerUserName);
         }
 
         /// <summary>
@@ -68,9 +80,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData("not-a-base-64-string")]
         public void Fail_for_invalid_photo(string photo)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Photo = photo
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Photo, photo);
+            validator.ShouldHaveValidationErrorFor(x => x.Photo);
         }
 
         /// <summary>
@@ -82,9 +98,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(null)]
         public void Fail_for_invalid_plate_number(string plateNumber)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        PlateNumber = plateNumber
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.PlateNumber, plateNumber);
+            validator.ShouldHaveValidationErrorFor(x => x.PlateNumber);
         }
 
         /// <summary>
@@ -96,9 +116,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(null)]
         public void Fail_for_invalid_vin(string vin)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        VIN = vin
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.VIN, vin);
+            validator.ShouldHaveValidationErrorFor(x => x.VIN);
         }
 
         /// <summary>
@@ -110,9 +134,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [InlineData(-1)]
         public void Fail_for_invalid_year(int year)
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Year = year
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Year, year);
+            validator.ShouldHaveValidationErrorFor(x => x.Year);
         }
 
         /// <summary>
@@ -121,9 +149,13 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [Fact(DisplayName = "Fails for when year is two years from now")]
         public void Fails_for_when_year_is_two_years_from_now()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Year = DateTime.Now.Year + 2
+                    });
 
-            validator.ShouldHaveValidationErrorFor(x => x.Year, DateTime.Now.Year + 2);
+            validator.ShouldHaveValidationErrorFor(x => x.Year);
         }
 
         /// <summary>
@@ -132,15 +164,25 @@ namespace Logistics.Vehicles.Test.Business.Vehicles.Commands.AddVehicle
         [Fact(DisplayName = "Passeses if the command is valid")]
         public void Passes_if_the_command_is_valid()
         {
-            var validator = this.Build();
+            var validator = this.Build()
+                .TestValidate(
+                    new AddVehicleCommand { 
+                        Manufacturer = this.Faker.Vehicle.Manufacturer(),
+                        Model = this.Faker.Vehicle.Model(),
+                        OwnerUserName = this.Faker.Random.Hexadecimal(24, string.Empty),
+                        Photo = "image/jpeg;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==",
+                        PlateNumber = this.Faker.Vehicle.GbRegistrationPlate(this.Faker.Date.Past(4), DateTime.Now),
+                        VIN = this.Faker.Vehicle.Vin(),
+                        Year = DateTime.Now.Year
+                    });
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Manufacturer, this.Faker.Vehicle.Manufacturer());
-            validator.ShouldNotHaveValidationErrorFor(x => x.Model, this.Faker.Vehicle.Model());
-            validator.ShouldNotHaveValidationErrorFor(x => x.OwnerUserName, this.Faker.Random.Hexadecimal(24, string.Empty));
-            validator.ShouldNotHaveValidationErrorFor(x => x.Photo, "image/jpeg;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==");
-            validator.ShouldNotHaveValidationErrorFor(x => x.PlateNumber, this.Faker.Vehicle.GbRegistrationPlate(this.Faker.Date.Past(4), DateTime.Now));
-            validator.ShouldNotHaveValidationErrorFor(x => x.VIN, this.Faker.Vehicle.Vin());
-            validator.ShouldNotHaveValidationErrorFor(x => x.Year, DateTime.Now.Year);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Manufacturer);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Model);
+            validator.ShouldNotHaveValidationErrorFor(x => x.OwnerUserName);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Photo);
+            validator.ShouldNotHaveValidationErrorFor(x => x.PlateNumber);
+            validator.ShouldNotHaveValidationErrorFor(x => x.VIN);
+            validator.ShouldNotHaveValidationErrorFor(x => x.Year);
         }
     }
 }
