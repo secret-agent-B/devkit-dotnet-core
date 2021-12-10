@@ -26,8 +26,8 @@ namespace Devkit.Security.Controllers
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        // TODO: THIS ROUTE EXPOSES USERS PERSONALLY IDENTIFIABLE INFORMATION (fix before end of jan 20201)
-        // TODO: THIS ROUTE NEEDS TO BE PROTECTED (fix before end of jan 20201)
+        // TODO: THIS ROUTE EXPOSES USERS PERSONALLY IDENTIFIABLE INFORMATION (fix before end of jan 2021)
+        // TODO: THIS ROUTE NEEDS TO BE PROTECTED (fix before end of jan 2021)
         [HttpGet("{userName}")]
         public async Task<UserVM> GetMyProfile([FromRoute] GetMyProfileQuery request) => await this.Mediator.Send(request);
 

@@ -1,7 +1,6 @@
 version: "3.5"
 
 services:
-
   devkit.consul:
     image: consul:1.9.1
     container_name: devkit.consul
@@ -13,7 +12,7 @@ services:
     command: consul agent -dev -log-level=warn -ui -client=0.0.0.0
 
   devkit.portainer:
-    image: portainer/portainer:1.24.1-alpine
+    image: portainer/portainer-ce:2.11.0-alpine
     container_name: devkit.portainer
     restart: unless-stopped
     networks:
@@ -54,7 +53,7 @@ services:
       - "27017:27017"
     networks:
       - devkit.net
-     
+
   devkit.elasticsearch:
     image: elasticsearch:7.8.1
     container_name: devkit.elasticsearch
@@ -75,7 +74,7 @@ services:
       - ELASTIC_VERSION=7.10.1
       - ELASTIC_SECURITY=true
       - ELASTIC_PASSWORD=Passw0rd123$$
-    
+
   devkit.kibana:
     image: kibana:7.8.1
     container_name: devkit.kibana
@@ -83,7 +82,7 @@ services:
     depends_on:
       - devkit.elasticsearch
     networks:
-      - devkit.net    
+      - devkit.net
     ports:
       - 5601:5601
     environment:
@@ -99,12 +98,12 @@ services:
     container_name: devkit.redisinsight
     restart: unless-stopped
     networks:
-      - devkit.net 
+      - devkit.net
     ports:
       - 6380:8001
     volumes:
       - devkit-redisinsight:/data
-    
+
   devkit.redis.chatr:
     image: bitnami/redis:6.0.9
     container_name: devkit.redis.chatr
@@ -117,7 +116,7 @@ services:
       - devkit-redis.chatr:/data
     environment:
       - REDIS_PASSWORD=Passw0rd123$$
-    
+
   devkit.redis.cache:
     image: bitnami/redis:6.0.9
     container_name: devkit.redis.cache
@@ -134,7 +133,7 @@ services:
 networks:
   devkit.net:
     driver: bridge
-    
+
 volumes:
   devkit-mongoclient:
   devkit-rabbitmq:

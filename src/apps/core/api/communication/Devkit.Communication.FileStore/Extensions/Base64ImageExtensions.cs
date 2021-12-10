@@ -8,9 +8,11 @@ namespace Devkit.Communication.FileStore.Extensions
 {
     using System;
     using System.Drawing;
-    using System.Drawing.Drawing2D;
     using System.IO;
     using System.Text.RegularExpressions;
+    using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Formats.Png;
+    using SixLabors.ImageSharp.Processing;
 
     /// <summary>
     /// File Base Manager handler.
@@ -30,7 +32,7 @@ namespace Devkit.Communication.FileStore.Extensions
             var binData = Convert.FromBase64String(base64Data);
 
             using var stream = new MemoryStream(binData);
-            using var image = Image.FromStream(stream);
+            using var image = Image.Load(stream);
 
             var newWidth = image.Width;
             var newHeight = image.Height;
@@ -50,23 +52,12 @@ namespace Devkit.Communication.FileStore.Extensions
                 }
             }
 
-            //Start creating new bitmap with the new dimension.
-            using var imageBitmap = new Bitmap(newWidth, newHeight);
-
-            //Start creating graphic effect for smoothing the file.
-            using (var imageGraph = Graphics.FromImage(imageBitmap))
-            {
-                imageGraph.CompositingQuality = CompositingQuality.HighQuality;
-                imageGraph.SmoothingMode = SmoothingMode.HighQuality;
-
-                //Start creating Rectangle to contain the image.
-                var imageRec = new Rectangle(0, 0, newWidth, newHeight);
-                imageGraph.DrawImage(image, imageRec);
-            }
+            // Resize image
+            image.Mutate(x => x.Resize(newWidth, newHeight));
 
             using (var responseStream = new MemoryStream())
             {
-                imageBitmap.Save(responseStream, image.RawFormat);
+                image.Save(responseStream, new PngEncoder());
                 return responseStream.ToArray();
             }
         }
