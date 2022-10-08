@@ -32,7 +32,7 @@ namespace Devkit.ChatR.Test.Fakers
                 .Setup(x => x.Value)
                 .Returns(new ChatRConfiguration
                 {
-                    SystemName = "Snappy",
+                    SystemName = "Devkit",
                     SupportPhoneNumber = faker.Person.Phone,
                     SystemRole = "System",
                     WelcomeMessage = faker.Rant.Review(),

@@ -3,7 +3,7 @@ read clean
 
 case $clean in
 "y")
-  kubectl delete po,svc,deploy,cm,pvc,pv,sc,secrets -l app=snappy --namespace devkit-ns
+  kubectl delete po,svc,deploy,cm,pvc,pv,sc,secrets -l app=devkit --namespace devkit-ns
   ;;
 esac
 
@@ -13,7 +13,7 @@ esac
 kubectl apply -f devkit-ns.yaml
 
 # Create the storage class for Azure persistent volume claim
-kubectl apply -f snappy-sc.yaml
+kubectl apply -f devkit-sc.yaml
 
 # Execute the definitions
 kubectl apply -f api-cache.yaml
@@ -34,7 +34,7 @@ metadata:
   namespace: devkit-ns
   name: persistentvol-$x
   labels:
-    app: snappy
+    app: devkit
     name: persistentvol-$x
     
 spec: 

@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: rabbitmq-pvc
   labels:
-    app: snappy
+    app: devkit
     name: rabbitmq-pvc
 
 spec:
@@ -21,7 +21,7 @@ metadata:
   namespace: devkit-ns
   name: rabbitmq-secrets
   labels:
-    app: snappy
+    app: devkit
     name: rabbitmq-secrets
 
 data:
@@ -35,21 +35,21 @@ metadata:
   namespace: devkit-ns
   name: rabbitmq-deployment
   labels:
-    app: snappy
+    app: devkit
     name: rabbitmq-deployment
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: snappy
+      app: devkit
       name: rabbitmq-pod
   template:
     metadata:
       namespace: devkit-ns
       name: rabbitmq-pod
       labels:
-        app: snappy
+        app: devkit
         name: rabbitmq-pod
 
     spec:
@@ -58,8 +58,8 @@ spec:
           image: rabbitmq:3.8.11-management-alpine
           resources:
             limits:
-              memory: '1Gi'
-              cpu: '1'
+              memory: "1Gi"
+              cpu: "1"
           volumeMounts:
             - mountPath: /var/lib/rabbitmq/mnesia
               name: rabbitmq-storage
@@ -78,13 +78,13 @@ metadata:
   namespace: devkit-ns
   name: rabbitmq-clusterip
   labels:
-    app: snappy
+    app: devkit
     name: rabbitmq-clusterip
 
 spec:
   type: ClusterIP
   selector:
-    app: snappy
+    app: devkit
     name: rabbitmq-pod
   ports:
     - port: 5672

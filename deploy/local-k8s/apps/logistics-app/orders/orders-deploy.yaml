@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: snappy
+  namespace: devkit
   name: orders-deploy
   labels:
     name: orders-deploy
-    app: snappy-app
+    app: devkit-app
     tier: api
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: orders-pod
-      app: snappy-app
+      app: devkit-app
       tier: api
   template:
     metadata:
@@ -20,7 +20,7 @@ spec:
       name: orders-pod
       labels:
         name: orders-pod
-        app: snappy-app
+        app: devkit-app
         tier: api
     spec:
       containers:

@@ -4,21 +4,21 @@ metadata:
   namespace: devkit-ns
   name: consul-deployment
   labels:
-    app: snappy
+    app: devkit
     name: consul-deployment
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: snappy
+      app: devkit
       name: consul-pod
   template:
     metadata:
       namespace: devkit-ns
       name: consul-pod
       labels:
-        app: snappy
+        app: devkit
         name: consul-pod
 
     spec:
@@ -27,8 +27,8 @@ spec:
           image: consul:latest
           resources:
             limits:
-              memory: '128Mi'
-              cpu: '1'
+              memory: "128Mi"
+              cpu: "1"
           ports:
             - containerPort: 8500
 
@@ -39,13 +39,13 @@ metadata:
   namespace: devkit-ns
   name: consul-clusterip
   labels:
-    app: snappy
+    app: devkit
     name: consul-clusterip
 
 spec:
   type: ClusterIP
   selector:
-    app: snappy
+    app: devkit
     name: consul-pod
   ports:
     - port: 8500

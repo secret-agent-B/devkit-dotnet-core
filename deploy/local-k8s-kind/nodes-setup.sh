@@ -1,5 +1,5 @@
 # Create a config file for a 3 nodes cluster
-cat << EOF > kind-snappy-3nodes.yaml
+cat << EOF > kind-devkit-3nodes.yaml
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -9,10 +9,10 @@ nodes:
 EOF
 
 # Create a new cluster with the config file
-kind create cluster --name snappy-cluster --config ./kind-snappy-3nodes.yaml
+kind create cluster --name devkit-cluster --config ./kind-devkit-3nodes.yaml
 
 # Remove the file
-rm -f kind-snappy-3nodes.yaml
+rm -f kind-devkit-3nodes.yaml
 
 # Check how many nodes it created
 kubectl get nodes
