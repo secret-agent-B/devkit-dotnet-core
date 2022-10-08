@@ -5,13 +5,13 @@ metadata:
   name: orders-service
   labels:
     name: orders-service
-    app: snappy-app
+    app: devkit-app
     tier: api
 spec:
   type: ClusterIP
   selector:
     name: orders-pod
-    app: snappy-app
+    app: devkit-app
     tier: api
   ports:
     - port: 443

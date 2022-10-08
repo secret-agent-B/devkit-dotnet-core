@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: chatr-deployment
   labels:
-    app: snappy
+    app: devkit
     name: chatr-deployment
 
 spec:
@@ -16,20 +16,20 @@ spec:
     metadata:
       name: chatr-pod
       labels:
-        app: snappy
+        app: devkit
         name: chatr-pod
 
     spec:
       containers:
         - name: chatr
-          image: snappy.azurecr.io/devkit-chatr:#{Build.BuildId}#
+          image: devkit.azurecr.io/devkit-chatr:#{Build.BuildId}#
           resources:
             requests:
-              memory: '128Mi'
-              cpu: '1'
+              memory: "128Mi"
+              cpu: "1"
             limits:
-              memory: '256Mi'
-              cpu: '1'
+              memory: "256Mi"
+              cpu: "1"
           ports:
             - containerPort: 80
           envFrom:
@@ -59,13 +59,13 @@ metadata:
   namespace: devkit-ns
   name: chatr-cluterip
   labels:
-    app: snappy
+    app: devkit
     name: chatr-cluterip
 
 spec:
   type: ClusterIP
   selector:
-    app: snappy
+    app: devkit
     name: chatr-pod
   ports:
     - port: 80
@@ -120,11 +120,11 @@ data:
         "KeyPrefix": ""
       },
       "ChatRConfiguration": {
-        "SystemName": "Snappy",
+        "SystemName": "devkit",
         "SystemRole": "System",
         "SupportPhoneNumber": "1-800-999-7777",
-        "SupportEmail": "support@snappy.com",
-        "WelcomeMessage": "Welcome and thank you for using Snappy!"
+        "SupportEmail": "support@devkit.com",
+        "WelcomeMessage": "Welcome and thank you for using devkit!"
       }
     }
 
@@ -135,7 +135,7 @@ metadata:
   namespace: devkit-ns
   name: chatr-secrets
   labels:
-    app: snappy
+    app: devkit
     name: chatr-secrets
 
 data:

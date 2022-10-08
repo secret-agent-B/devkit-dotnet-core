@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   devkit.gateway:
-    image: snappy/devkit-gateway:latest
+    image: devkit/devkit-gateway:latest
     build:
       context: .
       dockerfile: apps/core/api/gateway/Devkit.Gateway/Dockerfile
@@ -26,7 +26,7 @@ services:
       - ./configs/infrastructure/:/app/infrastructure:ro
 
   devkit.security:
-    image: snappy/devkit-security:latest
+    image: devkit/devkit-security:latest
     build:
       context: .
       dockerfile: apps/core/api/security/Devkit.Security/Dockerfile
@@ -52,7 +52,7 @@ services:
       - ./configs/infrastructure/:/app/infrastructure:ro
 
   devkit.file-store:
-    image: snappy/devkit-file-store:latest
+    image: devkit/devkit-file-store:latest
     build:
       context: .
       dockerfile: apps/core/api/file-store/Devkit.FileStore/Dockerfile
@@ -71,7 +71,7 @@ services:
       - ./configs/infrastructure/:/app/infrastructure:ro
 
   devkit.chatr:
-    image: snappy/devkit-chatr:latest
+    image: devkit/devkit-chatr:latest
     build:
       context: .
       dockerfile: apps/core/api/chatr/Devkit.ChatR/Dockerfile
@@ -95,7 +95,7 @@ services:
       - ./configs/infrastructure/:/app/infrastructure:ro
 
   devkit.ratings:
-    image: snappy/devkit-ratings:latest
+    image: devkit/devkit-ratings:latest
     build:
       context: .
       dockerfile: apps/core/api/rating/Devkit.Ratings/Dockerfile
@@ -112,9 +112,9 @@ services:
     volumes:
       - ./configs/services/ratings-api/:/app/configs:ro
       - ./configs/infrastructure/:/app/infrastructure:ro
-    
+
   logistics.orders:
-    image: snappy/logistics-orders:latest
+    image: devkit/logistics-orders:latest
     build:
       context: .
       dockerfile: apps/logistics-app/domain/order/Logistics.Orders.API/Dockerfile
@@ -131,9 +131,9 @@ services:
     volumes:
       - ./configs/services/orders-api/:/app/configs:ro
       - ./configs/infrastructure/:/app/infrastructure:ro
-    
+
   logistics.store:
-    image: snappy/logistics-store:latest
+    image: devkit/logistics-store:latest
     build:
       context: .
       dockerfile: apps/logistics-app/domain/store/Logistics.Store.API/Dockerfile
@@ -150,9 +150,9 @@ services:
     volumes:
       - ./configs/services/store-api/:/app/configs:ro
       - ./configs/infrastructure/:/app/infrastructure:ro
-    
+
   logistics.vehicles:
-    image: snappy/logistics-vehicles:latest
+    image: devkit/logistics-vehicles:latest
     build:
       context: .
       dockerfile: apps/logistics-app/domain/vehicle/Logistics.Vehicles.API/Dockerfile

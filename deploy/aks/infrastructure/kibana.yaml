@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: kibana-configmaps
   labels:
-    app: snappy
+    app: devkit
     name: kibana-configmaps
 
 data:
@@ -13,14 +13,13 @@ data:
   xpack.fleet.agents.tlsCheckDisabled: "true"
 
 ---
-
 apiVersion: v1
 kind: Secret
 metadata:
   namespace: devkit-ns
   name: kibana-secret
   labels:
-    app: snappy
+    app: devkit
     name: kibana-secret
 
 type: Opaque
@@ -31,42 +30,41 @@ data:
   xpack.encryptedSavedObjects.encryptionKey: MDBjYzMwZTcyMzA2NGY0NzkxZWI1NDc1NmIxMmEwNmU=
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: devkit-ns
   name: kibana-deploy
   labels:
-    app: snappy
+    app: devkit
     name: kibana-deploy
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: snappy
+      app: devkit
       name: kibana-pod
   template:
     metadata:
       namespace: devkit-ns
       name: kibana-pod
       labels:
-        app: snappy
+        app: devkit
         name: kibana-pod
 
     spec:
       containers:
-      - name: kibana-pod
-        image: kibana:7.10.1
-        resources:
-          limits:
-            memory: "1Gi"
-            cpu: "1"
-        ports:
-        - containerPort: 5601
-        envFrom:
-          - configMapRef:
-              name: kibana-configmaps
-          - secretRef:
-              name: kibana-secret
+        - name: kibana-pod
+          image: kibana:7.10.1
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          ports:
+            - containerPort: 5601
+          envFrom:
+            - configMapRef:
+                name: kibana-configmaps
+            - secretRef:
+                name: kibana-secret

@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: api-secrets
   labels:
-    app: snappy
+    app: devkit
     name: api-secrets
 
 data:
@@ -12,15 +12,14 @@ data:
   ServiceBusConfiguration__Password: UGFzc3cwcmQxMjMk
   ElasticsearchConfiguration__Username: ZWxhc3RpYw==
   ElasticsearchConfiguration__Password: UGFzc3cwcmQxMjMk
---- 
-
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: devkit-ns
   name: base-settings-configmap
   labels:
-    app: snappy
+    app: devkit
     name: devkit-ns
 
 data:
@@ -64,14 +63,13 @@ data:
     }
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: devkit-ns
   name: envvar-configmap
   labels:
-    app: snappy
+    app: devkit
     name: envvar-configmap
 
 data:

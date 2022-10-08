@@ -2,10 +2,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   namespace: devkit-ns
-  name: snappy-storageclass
+  name: devkit-storageclass
   labels:
-    app: snappy
-    name: snappy-storageclass
+    app: devkit
+    name: devkit-storageclass
 
 provisioner: kubernetes.io/azure-file
 mountOptions:
@@ -18,7 +18,6 @@ mountOptions:
   - actimeo=30
 parameters:
   skuName: Standard_ZRS
-
 # Standard_LRS - standard locally redundant storage (LRS)
 # Standard_GRS - standard geo-redundant storage (GRS)
 # Standard_ZRS - standard zone redundant storage (ZRS)

@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: vehicles-deployment
   labels:
-    app: snappy
+    app: devkit
     name: vehicles-deployment
 
 spec:
@@ -16,20 +16,20 @@ spec:
     metadata:
       name: vehicles-pod
       labels:
-        app: snappy
+        app: devkit
         name: vehicles-pod
 
     spec:
       containers:
         - name: vehicles
-          image: snappy.azurecr.io/logistics-vehicles:#{Build.BuildId}#
+          image: devkit.azurecr.io/logistics-vehicles:#{Build.BuildId}#
           resources:
             requests:
-              memory: '128Mi'
-              cpu: '1'
+              memory: "128Mi"
+              cpu: "1"
             limits:
-              memory: '256Mi'
-              cpu: '1'
+              memory: "256Mi"
+              cpu: "1"
           ports:
             - containerPort: 80
           envFrom:
@@ -59,13 +59,13 @@ metadata:
   namespace: devkit-ns
   name: vehicles-cluterip
   labels:
-    app: snappy
+    app: devkit
     name: vehicles-cluterip
 
 spec:
   type: ClusterIP
   selector:
-    app: snappy
+    app: devkit
     name: vehicles-pod
   ports:
     - port: 80
@@ -112,7 +112,7 @@ metadata:
   namespace: devkit-ns
   name: vehicles-secrets
   labels:
-    app: snappy
+    app: devkit
     name: vehicles-secrets
 
 data:

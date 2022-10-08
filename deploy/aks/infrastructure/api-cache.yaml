@@ -4,7 +4,7 @@ metadata:
   namespace: devkit-ns
   name: api-cache-pvc
   labels:
-    app: snappy
+    app: devkit
     name: api-cache-pvc
 
 spec:
@@ -21,7 +21,7 @@ metadata:
   namespace: devkit-ns
   name: api-cache-secrets
   labels:
-    app: snappy
+    app: devkit
     name: api-cache-secrets
 
 data:
@@ -34,20 +34,20 @@ metadata:
   namespace: devkit-ns
   name: api-cache-deployment
   labels:
-    app: snappy
+    app: devkit
     name: api-cache-deployment
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: snappy
+      app: devkit
       name: api-cache-pod
   template:
     metadata:
       name: api-cache-pod
       labels:
-        app: snappy
+        app: devkit
         name: api-cache-pod
 
     spec:
@@ -56,8 +56,8 @@ spec:
           image: bitnami/redis:latest
           resources:
             limits:
-              memory: '256Mi'
-              cpu: '1'
+              memory: "256Mi"
+              cpu: "1"
           volumeMounts:
             - mountPath: /redis-master-data
               name: api-cache-volume
@@ -80,13 +80,13 @@ metadata:
   namespace: devkit-ns
   name: api-cache-clusterip
   labels:
-    app: snappy
+    app: devkit
     name: api-cache-clusterip
 
 spec:
   type: ClusterIP
   selector:
-    app: snappy
+    app: devkit
     name: api-cache-pod
   ports:
     - port: 6379
