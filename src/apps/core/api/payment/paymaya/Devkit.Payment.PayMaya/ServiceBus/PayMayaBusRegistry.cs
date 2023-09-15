@@ -8,7 +8,7 @@ namespace Devkit.Payment.PayMaya.ServiceBus
 {
     using Devkit.Payment.PayMaya.ServiceBus.Consumers.CreateInvoice;
     using Devkit.ServiceBus.Interfaces;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
 
     /// <summary>
     /// The PayMayaBusRegistry handles registration of consumers and request clients for PayMaya service.
@@ -19,7 +19,7 @@ namespace Devkit.Payment.PayMaya.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumer<CreateInvoiceConsumer>();
         }

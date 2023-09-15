@@ -4,7 +4,7 @@
         <Configurations>Debug;Release;Test</Configurations>
     </PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+	  <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
 	</ItemGroup>
 	<ItemGroup>
         <ProjectReference Include="..\..\..\sdk\communication\Devkit.ServiceBus\Devkit.ServiceBus.csproj" />

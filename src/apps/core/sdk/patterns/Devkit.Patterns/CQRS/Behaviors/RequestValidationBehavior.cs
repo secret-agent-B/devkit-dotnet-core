@@ -54,8 +54,7 @@ namespace Devkit.Patterns.CQRS.Behaviors
         /// <returns>
         /// Awaitable task returning the <typeparamref name="TResponse" />.
         /// </returns>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Handled by MediatR.")]
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var context = new ValidationContext<TRequest>(request);
 

@@ -13,7 +13,7 @@ namespace Devkit.WebAPI
     using Devkit.WebAPI.Extensions;
     using Devkit.WebAPI.Filters;
     using Devkit.WebAPI.ServiceRegistry;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Routing;
@@ -118,7 +118,7 @@ namespace Devkit.WebAPI
         /// <param name="services">The services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var mvcBuilder = services
+            services
                 .AddMvc(options =>
                 {
                     options.Filters.Add(typeof(PipelineFilterAttribute));
@@ -136,10 +136,9 @@ namespace Devkit.WebAPI
             services.AddHealthChecks();
             services.AddRepository();
             services.AddMediatRAssemblies(this.MediatorAssemblies);
+            services.AddValidationAssemblies(this.ValidationAssemblies);
             services.AddServiceRegistry();
             services.AddSwagger(this._apiDefinition);
-
-            mvcBuilder.AddValidationAssemblies(this.ValidationAssemblies);
 
             this.CustomConfigureServices(services);
         }
@@ -148,7 +147,7 @@ namespace Devkit.WebAPI
         /// Adds the consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        protected virtual void AddConsumers(IServiceCollectionBusConfigurator configurator)
+        protected virtual void AddConsumers(IBusRegistrationConfigurator configurator)
         {
             // do nothing...
         }

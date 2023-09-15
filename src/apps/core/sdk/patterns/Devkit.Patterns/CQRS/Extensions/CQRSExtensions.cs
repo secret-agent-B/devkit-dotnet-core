@@ -11,6 +11,7 @@ namespace Devkit.Patterns.CQRS.Extensions
     using System.Linq;
     using System.Reflection;
     using Devkit.Patterns.CQRS.Behaviors;
+    using FluentValidation;
     using FluentValidation.AspNetCore;
     using MediatR;
     using MediatR.Pipeline;
@@ -33,7 +34,10 @@ namespace Devkit.Patterns.CQRS.Extensions
         {
             if (assemblies.Any())
             {
-                services.AddMediatR(assemblies.ToArray());
+                services.AddMediatR((config) =>
+                {
+                    config.RegisterServicesFromAssemblies(assemblies.ToArray());
+                });
 
                 services.AddTransient(typeof(IRequestPreProcessor<>), typeof(RequestLoggerBehavior<>));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
@@ -57,7 +61,10 @@ namespace Devkit.Patterns.CQRS.Extensions
         {
             if (handlers.Any())
             {
-                services.AddMediatR(handlers, configuration);
+                services.AddMediatR((config) =>
+                {
+                    config.RegisterServicesFromAssemblies(handlers.Select(x => x.Assembly).ToArray());
+                });
 
                 services.AddTransient(typeof(IRequestPreProcessor<>), typeof(RequestLoggerBehavior<>));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
@@ -74,14 +81,15 @@ namespace Devkit.Patterns.CQRS.Extensions
         /// <param name="builder">The builder.</param>
         /// <param name="assemblies">The assemblies.</param>
         /// <returns>An MVC builder instance.</returns>
-        public static IMvcBuilder AddValidationAssemblies(this IMvcBuilder builder, IEnumerable<Assembly> assemblies)
+        public static IServiceCollection AddValidationAssemblies(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             if (assemblies.Any())
             {
-                builder.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(assemblies));
+                services
+                    .AddValidatorsFromAssemblies(assemblies);
             }
 
-            return builder;
+            return services;
         }
     }
 }

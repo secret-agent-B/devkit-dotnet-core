@@ -16,7 +16,7 @@ namespace Devkit.Ratings.Test.Business.Ratings.Commands.SubmitRating
     using Devkit.Test;
     using MediatR;
     using Moq;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// Unit_SubmitRatingHandler class is the unit test for SubmitRatingHandler.
@@ -26,18 +26,18 @@ namespace Devkit.Ratings.Test.Business.Ratings.Commands.SubmitRating
         /// <summary>
         /// Should be able to submit rating to another user.
         /// </summary>
-        [Fact(DisplayName = "Should be able to submit rating to another user")]
+        [TestCase(TestName = "Should be able to submit rating to another user")]
         public async Task Should_be_able_to_submit_rating_to_another_user()
         {
             var (handler, command) = this.Build();
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.True(response.IsSuccessful);
-            Assert.Equal(response.Value, command.Value);
-            Assert.Equal(response.AuthorUserName, command.AuthorUserName);
-            Assert.Equal(response.ReceiverUserName, command.ReceiverUserName);
-            Assert.Equal(response.Summary, command.Summary);
-            Assert.Equal(response.TransactionId, command.TransactionId);
+            Assert.IsTrue(response.IsSuccessful);
+            Assert.AreEqual(response.Value, command.Value);
+            Assert.AreEqual(response.AuthorUserName, command.AuthorUserName);
+            Assert.AreEqual(response.ReceiverUserName, command.ReceiverUserName);
+            Assert.AreEqual(response.Summary, command.Summary);
+            Assert.AreEqual(response.TransactionId, command.TransactionId);
         }
 
         /// <summary>

@@ -15,7 +15,6 @@ namespace Devkit.ServiceBus.Extensions
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Newtonsoft.Json;
 
     /// <summary>
     /// The service bus extensions class.
@@ -67,7 +66,7 @@ namespace Devkit.ServiceBus.Extensions
                 registry.RegisterConsumers(x);
 
                 // Add bus to the container.
-                x.AddBus(context => Bus.Factory.CreateUsingRabbitMq(cfg =>
+                x.UsingRabbitMq((ctx, config) =>
                 {
                     var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
                     var configuration = new ConfigurationBuilder()
@@ -77,11 +76,7 @@ namespace Devkit.ServiceBus.Extensions
 
                     var options = configuration.GetSection(ServiceBusConfiguration.Section).Get<ServiceBusConfiguration>();
 
-                    Console.WriteLine(new String('-', 10));
-                    Console.WriteLine(JsonConvert.SerializeObject(configuration, Formatting.Indented));
-                    Console.WriteLine(new String('-', 10));
-
-                    cfg.Host(
+                    config.Host(
                         new Uri($"amqp://{options.Host}"),
                         hostConfig =>
                         {
@@ -94,8 +89,8 @@ namespace Devkit.ServiceBus.Extensions
                     // endpoint name formatter. If no endpoint name formatter is specified and an
                     // MassTransit.IEndpointNameFormatter is registered in the container, it is resolved from the container.
                     // Otherwise, the MassTransit.Definition.DefaultEndpointNameFormatter is used.
-                    cfg.ConfigureEndpoints(context, new EndpointNameFormatter());
-                }));
+                    config.ConfigureEndpoints(ctx, new EndpointNameFormatter());
+                });
             });
 
             // Needed for transferring files within the ecosystem.

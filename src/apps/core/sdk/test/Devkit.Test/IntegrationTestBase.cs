@@ -12,7 +12,9 @@ namespace Devkit.Test
     using System.Threading.Tasks;
     using Devkit.Data;
     using Newtonsoft.Json;
-    using Xunit;
+    using NUnit;
+    using NUnit.Framework;
+    using NUnit.Framework.Internal;
 
     /// <summary>
     /// The base class that helps facilitate integration tests.
@@ -20,36 +22,38 @@ namespace Devkit.Test
     /// <typeparam name="T">The type of input that is being tested.</typeparam>
     /// <typeparam name="TStartup">The type of the startup.</typeparam>
     /// <seealso cref="TestBase{T}" />
-    [Trait("Category", "Integration Test")]
-    public abstract class IntegrationTestBase<T, TStartup> : TestBase<T>, IClassFixture<AppTestFixture<TStartup>>
+    [Category("Integration Test")]
+    public abstract class IntegrationTestBase<T, TStartup> : TestBase<T>
         where TStartup : class
     {
         /// <summary>
         /// The application test fixture.
         /// </summary>
-        private readonly AppTestFixture<TStartup> _appTestFixture;
+        private IntegrationWebApplicationFactory<TStartup> _intgWebAppFactory;
 
         /// <summary>
         /// The HTTP client.
         /// </summary>
-        private HttpClient _httpClient;
+        private HttpClient _client;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IntegrationTestBase{T, TStartup}"/> class.
-        /// </summary>
-        /// <param name="testFixture">The application test fixture.</param>
-        protected IntegrationTestBase(AppTestFixture<TStartup> testFixture)
-            : base()
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
+            // Setup database stuff.
             this.Repository = new Repository(new RepositoryOptions
             {
-                ConnectionString = testFixture?.RepositoryConfiguration.ConnectionString,
-                DatabaseName = testFixture?.RepositoryConfiguration.DatabaseName
+                ConnectionString = this.WebApplicationFactory.RepositoryConfiguration.ConnectionString,
+                DatabaseName = this.WebApplicationFactory.RepositoryConfiguration.DatabaseName
             });
 
+            // Seed the database.
             this.SeedDatabase();
+        }
 
-            this._appTestFixture = testFixture;
+        [SetUp]
+        public void SetUp()
+        {
+            this._client = this.WebApplicationFactory.CreateClient();
         }
 
         /// <summary>
@@ -58,10 +62,15 @@ namespace Devkit.Test
         /// <value>
         /// The client.
         /// </value>
-        protected HttpClient Client
-        {
-            get { return this._httpClient ??= this._appTestFixture.Server.CreateClient(); }
-        }
+        protected HttpClient Client => this._client;
+
+        /// <summary>
+        /// The web app factory instance that can be configured.
+        /// </summary>
+        /// <value>
+        /// The web app factory.
+        /// </value>
+        protected IntegrationWebApplicationFactory<TStartup> WebApplicationFactory => this._intgWebAppFactory ??= new IntegrationWebApplicationFactory<TStartup>();
 
         /// <summary>
         /// Deletes the asynchronous.

@@ -8,7 +8,6 @@ namespace Devkit.Gateway.ServiceBus
 {
     using Devkit.ServiceBus.Interfaces;
     using MassTransit;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
 
     /// <summary>
     /// THe OrderBusRegistry registers the consumers and request clients for the Orders API.
@@ -20,7 +19,7 @@ namespace Devkit.Gateway.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumersFromNamespaceContaining<GatewayBusRegistry>();
         }

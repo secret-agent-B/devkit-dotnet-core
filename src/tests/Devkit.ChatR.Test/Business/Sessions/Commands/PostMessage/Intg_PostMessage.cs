@@ -17,9 +17,8 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         /// <summary>
         /// Initializes a new instance of the <see cref="Intg_PostMessage"/> class.
         /// </summary>
-        /// <param name="testFixture">The application test fixture.</param>
-        public Intg_PostMessage(AppTestFixture<Startup> testFixture)
-            : base(testFixture)
+        public Intg_PostMessage()
+            : base()
         {
         }
     }

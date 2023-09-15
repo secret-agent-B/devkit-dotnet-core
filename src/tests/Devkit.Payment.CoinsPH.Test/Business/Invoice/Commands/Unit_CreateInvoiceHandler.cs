@@ -20,7 +20,7 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
     using Moq;
     using Moq.Protected;
     using Newtonsoft.Json;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// The Unit_CreateInvoiceHandler is the unit test for CreateInvoiceHandler.
@@ -30,19 +30,19 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         /// <summary>
         /// Should be able to create invoice.
         /// </summary>
-        [Fact(DisplayName = "Should be able to create invoice")]
+        [TestCase(TestName = "Should be able to create invoice")]
         public async Task Should_be_able_to_create_invoice()
         {
             var (command, handler) = this.Build();
 
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.True(response.IsSuccessful);
+            Assert.IsTrue(response.IsSuccessful);
             Assert.False(string.IsNullOrEmpty(response.InvoiceId));
-            Assert.Equal(command.TransactionId, response.TransactionId);
-            Assert.Equal(command.Amount, response.Amount);
-            Assert.Equal(command.Amount, response.AmountDue);
-            Assert.Equal(command.Currency, response.Currency);
+            Assert.AreEqual(command.TransactionId, response.TransactionId);
+            Assert.AreEqual(command.Amount, response.Amount);
+            Assert.AreEqual(command.Amount, response.AmountDue);
+            Assert.AreEqual(command.Currency, response.Currency);
             Assert.NotNull(response.PaymentUrl);
             Assert.NotNull(response.CreatedAt);
             Assert.NotNull(response.UpdatedAt);

@@ -8,7 +8,7 @@ namespace Devkit.Security.Test.ServiceBus
 {
     using Devkit.Communication.FileStore.Fakes.Consumers;
     using Devkit.ServiceBus.Interfaces;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
 
     /// <summary>
     /// The test security bus registry.
@@ -20,7 +20,7 @@ namespace Devkit.Security.Test.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumer<FakeUploadBase64ImageConsumer>();
         }

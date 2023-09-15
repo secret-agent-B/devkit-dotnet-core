@@ -14,9 +14,9 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
     using Devkit.ChatR.Test.Fakers;
     using Devkit.Test;
     using Moq;
+    using NUnit.Framework;
     using StackExchange.Redis;
     using StackExchange.Redis.Extensions.Core.Abstractions;
-    using Xunit;
 
     /// <summary>
     /// Unit test for PostMessageHandler.
@@ -27,24 +27,24 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
         /// Should be able to post a message to existing session.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        [Fact(DisplayName = "Should be able to post a message to existing session")]
+        [TestCase(TestName = "Should be able to post a message to existing session")]
         public async Task Should_be_able_to_post_a_message_to_existing_session()
         {
             var (command, handler) = this.Build();
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.True(response.IsSuccessful);
+            Assert.IsTrue(response.IsSuccessful);
             Assert.False(response.IsDeleted);
-            Assert.NotEmpty(response.Id);
+            Assert.IsNotEmpty(response.Id);
             Assert.NotNull(response.Timestamp);
-            Assert.Equal(command.UserName, response.AuthorUserName);
-            Assert.Equal(command.Message, response.Message);
+            Assert.AreEqual(command.UserName, response.AuthorUserName);
+            Assert.AreEqual(command.Message, response.Message);
         }
 
         /// <summary>
         /// Should fail if non participant tries to post to session.
         /// </summary>
-        [Fact(DisplayName = "Should fail if non participant tries to post to session")]
+        [TestCase(TestName = "Should fail if non participant tries to post to session")]
         public async Task Should_fail_if_non_participant_tries_to_post_to_session()
         {
             var (command, handler) = this.Build();
@@ -53,13 +53,13 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
             var response = await handler.Handle(command, CancellationToken.None);
 
             Assert.False(response.IsSuccessful);
-            Assert.True(response.Exceptions.ContainsKey(nameof(command.SessionId)));
+            Assert.IsTrue(response.Exceptions.ContainsKey(nameof(command.SessionId)));
         }
 
         /// <summary>
         /// Should fail to post a message to invalid session identifier.
         /// </summary>
-        [Fact(DisplayName = "Should fail to post a message to invalid session identifier")]
+        [TestCase(TestName = "Should fail to post a message to invalid session identifier")]
         public async Task Should_fail_to_post_a_message_to_invalid_session_id()
         {
             var (command, handler) = this.Build();
@@ -68,7 +68,7 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
             var response = await handler.Handle(command, CancellationToken.None);
 
             Assert.False(response.IsSuccessful);
-            Assert.True(response.Exceptions.ContainsKey(nameof(command.UserName)));
+            Assert.IsTrue(response.Exceptions.ContainsKey(nameof(command.UserName)));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
                 SessionId = session.Id
             };
 
-            var mockRedisCache = new Mock<IRedisCacheClient>();
+            var mockRedisCache = new Mock<IRedisClient>();
 
             mockRedisCache
                 .Setup(x => x.Db0.ExistsAsync(It.IsAny<string>(), It.IsAny<CommandFlags>()))

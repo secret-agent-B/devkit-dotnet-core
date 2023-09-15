@@ -9,14 +9,14 @@ namespace Devkit.Test
     using System;
     using Devkit.Data;
     using Mongo2Go;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// The base class that helps facilitate unit tests.
     /// </summary>
     /// <typeparam name="T">The type of input to the handler that is being tested.</typeparam>
     /// <seealso cref="TestBase{T}" />
-    [Trait("Category", "Unit Test")]
+    [Category("Unit Test")]
     public abstract class UnitTestBase<T> : TestBase<T>
     {
         /// <summary>

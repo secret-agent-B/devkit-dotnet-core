@@ -14,7 +14,7 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
     using Devkit.Security.Test.Fakers;
     using Microsoft.AspNetCore.Identity;
     using Moq;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// Unit_GetMyProfileHandler class is the unit test for GetMyProfileHandler.
@@ -33,39 +33,39 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
         /// <summary>
         /// Should be able to get my profile.
         /// </summary>
-        [Fact(DisplayName = "Should be able to get my profile")]
+        [TestCase(TestName = "Should be able to get my profile")]
         public async Task Should_be_able_to_get_my_profile()
         {
             var (query, handler) = this.Build();
             var response = await handler.Handle(query, CancellationToken.None);
 
-            Assert.True(response.IsSuccessful);
-            Assert.Equal(query.UserName, response.UserName);
-            Assert.Equal(query.UserName, response.Email);
-            Assert.NotEqual(default, response.FirstName);
-            Assert.NotEqual(default, response.MiddleName);
-            Assert.NotEqual(default, response.LastName);
-            Assert.NotEqual(default, response.Address1);
-            Assert.NotEqual(default, response.Address2);
-            Assert.NotEqual(default, response.City);
-            Assert.NotEqual(default, response.Province);
-            Assert.NotEqual(default, response.Country);
-            Assert.NotEqual(default, response.ZipCode);
-            Assert.NotEmpty(response.IdentificationCards);
+            Assert.IsTrue(response.IsSuccessful);
+            Assert.AreEqual(query.UserName, response.UserName);
+            Assert.AreEqual(query.UserName, response.Email);
+            Assert.AreNotEqual(default, response.FirstName);
+            Assert.AreNotEqual(default, response.MiddleName);
+            Assert.AreNotEqual(default, response.LastName);
+            Assert.AreNotEqual(default, response.Address1);
+            Assert.AreNotEqual(default, response.Address2);
+            Assert.AreNotEqual(default, response.City);
+            Assert.AreNotEqual(default, response.Province);
+            Assert.AreNotEqual(default, response.Country);
+            Assert.AreNotEqual(default, response.ZipCode);
+            Assert.IsNotEmpty(response.IdentificationCards);
 
             foreach (var responseIdentificationCard in response.IdentificationCards)
             {
-                Assert.NotEqual(default, responseIdentificationCard.Number);
-                Assert.NotEqual(default, responseIdentificationCard.Type);
-                Assert.NotEqual(default, responseIdentificationCard.ImageId);
+                Assert.AreNotEqual(default, responseIdentificationCard.Number);
+                Assert.AreNotEqual(default, responseIdentificationCard.Type);
+                Assert.AreNotEqual(default, responseIdentificationCard.ImageId);
             }
         }
 
         /// <summary>
         /// Should return not found if no match was found.
         /// </summary>
-        [Fact(DisplayName = "Should return not found if no match was found")]
-        public async Task Should_return_not_found_if_no_match_was_found()
+        [TestCase(TestName = "Should return not found if no match was found")]
+        public void Should_return_not_found_if_no_match_was_found()
         {
             var (query, _) = this.Build();
 
@@ -76,7 +76,7 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
 
             using var handler = new GetMyProfileHandler(this.Repository, mock.Object);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(query, CancellationToken.None));
+            Assert.ThrowsAsync<NotFoundException>(async () => await handler.Handle(query, CancellationToken.None));
         }
 
         /// <summary>

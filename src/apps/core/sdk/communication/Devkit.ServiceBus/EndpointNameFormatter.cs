@@ -8,7 +8,6 @@ namespace Devkit.ServiceBus
 {
     using System;
     using MassTransit;
-    using MassTransit.Definition;
 
     /// <summary>
     /// An endpoint name formatter.

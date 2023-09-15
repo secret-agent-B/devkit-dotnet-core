@@ -29,21 +29,20 @@ namespace Devkit.Security.Test
         /// <summary>
         /// Initializes a new instance of the <see cref="SecurityIntegrationTestBase{T}"/> class.
         /// </summary>
-        /// <param name="testFixture">The application test fixture.</param>
-        protected SecurityIntegrationTestBase(AppTestFixture<Startup> testFixture)
-            : base(testFixture)
+        protected SecurityIntegrationTestBase()
+            : base()
         {
             Environment.SetEnvironmentVariable("GOOGLE_CLIENT_ID", this.Faker.Random.AlphaNumeric(10));
             Environment.SetEnvironmentVariable("GOOGLE_SECRET", this.Faker.Random.AlphaNumeric(10));
             Environment.SetEnvironmentVariable("FACEBOOK_CLIENT_ID", this.Faker.Random.AlphaNumeric(10));
             Environment.SetEnvironmentVariable("FACEBOOK_SECRET", this.Faker.Random.AlphaNumeric(10));
 
-            testFixture?.ConfigureTestServices(services =>
+            this.WebApplicationFactory?.ConfigureTestServices(services =>
             {
                 // Setup user manager and role manager for integration test overriding the default implementation.
                 var databaseOptions = new MongoIdentityOptions
                 {
-                    ConnectionString = testFixture.RepositoryConfiguration.ConnectionString
+                    ConnectionString = this.WebApplicationFactory.RepositoryConfiguration.ConnectionString
                 };
 
                 var options = new MongoIdentityOptions
