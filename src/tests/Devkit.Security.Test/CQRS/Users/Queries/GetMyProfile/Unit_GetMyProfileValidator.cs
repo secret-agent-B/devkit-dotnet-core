@@ -9,7 +9,7 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
     using Devkit.Security.Business.Users.Queries.GetMyProfile;
     using Devkit.Test;
     using FluentValidation.TestHelper;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// Unit_GetMyProfileValidator class is the unit test for GetMyProfileValidator.
@@ -20,26 +20,37 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
         /// Fails if username is invalid.
         /// </summary>
         /// <param name="userName">Name of the user.</param>
-        [Theory(DisplayName = "Fails if username is invalid")]
-        [InlineData("")]
-        [InlineData("1")]
-        [InlineData("@!@#.com")]
-        [InlineData("1234567890")]
+        [Theory()]
+        [TestCase("")]
+        [TestCase("1")]
+        [TestCase("@!@#.com")]
+        [TestCase("1234567890")]
         public void Fail_if_username_is_invalid(string userName)
         {
             var validator = this.Build();
-            validator.ShouldHaveValidationErrorFor(x => x.UserName, userName);
+            var model = new GetMyProfileQuery
+            {
+                UserName = userName,
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldHaveValidationErrorFor(x => x.UserName);
         }
 
         /// <summary>
         /// Passes if username is valid.
         /// </summary>
-        [Fact(DisplayName = "Passes if username is valid")]
+        [Theory()]
+        [TestCase("a@x.com")]
+        [TestCase("radriano@microsoft.com")]
         public void Pass_if_username_is_valid()
         {
             var validator = this.Build();
-            validator.ShouldNotHaveValidationErrorFor(x => x.UserName, this.Faker.Person.Email);
-            validator.ShouldNotHaveValidationErrorFor(x => x.UserName, "a@x.com");
+            var model = new GetMyProfileQuery
+            {
+                UserName = this.Faker.Person.Email
+            };
+            var result = validator.TestValidate(model);
+            result.ShouldNotHaveValidationErrorFor(x => x.UserName);
         }
     }
 }

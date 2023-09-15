@@ -10,9 +10,7 @@ namespace Devkit.Communication.FileStore.Extensions
     using System.Drawing;
     using System.IO;
     using System.Text.RegularExpressions;
-    using SixLabors.ImageSharp;
-    using SixLabors.ImageSharp.Formats.Png;
-    using SixLabors.ImageSharp.Processing;
+    using System.Drawing.Imaging;
 
     /// <summary>
     /// File Base Manager handler.
@@ -29,10 +27,11 @@ namespace Devkit.Communication.FileStore.Extensions
         {
             // copied from https://gist.github.com/vbfox/484643
             var base64Data = Regex.Match(dataString, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-            var binData = Convert.FromBase64String(base64Data);
+            var imageBytes = Convert.FromBase64String(base64Data);
 
-            using var stream = new MemoryStream(binData);
-            using var image = Image.Load(stream);
+            using var stream = new MemoryStream(imageBytes, 0, imageBytes.Length);
+            stream.Write(imageBytes, 0, imageBytes.Length);
+            var image = new Bitmap(stream);
 
             var newWidth = image.Width;
             var newHeight = image.Height;
@@ -53,11 +52,11 @@ namespace Devkit.Communication.FileStore.Extensions
             }
 
             // Resize image
-            image.Mutate(x => x.Resize(newWidth, newHeight));
+            image.SetResolution(newWidth, newHeight);
 
             using (var responseStream = new MemoryStream())
             {
-                image.Save(responseStream, new PngEncoder());
+                image.Save(responseStream, ImageFormat.Png);
                 return responseStream.ToArray();
             }
         }

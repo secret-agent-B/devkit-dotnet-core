@@ -89,7 +89,7 @@ namespace Devkit.Test
 
                             x.UsingInMemory((context, cfg) =>
                             {
-                                cfg.TransportConcurrencyLimit = 100;
+                                cfg.ConcurrentMessageLimit = 100;
                                 cfg.ConfigureEndpoints(context);
                             });
                         });

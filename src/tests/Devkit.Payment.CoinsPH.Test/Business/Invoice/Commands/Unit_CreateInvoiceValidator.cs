@@ -9,7 +9,9 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
     using Devkit.Test;
     using FluentValidation.TestHelper;
     using Devkit.Payment.CoinsPH.Business.Invoice.Commands.CreateInvoice;
-    using Xunit;
+    using NUnit.Framework;
+    using static MongoDB.Driver.WriteConcern;
+    using System.Transactions;
 
     /// <summary>
     /// The Unit_CreateInvoiceValidator is CreateInvoiceValidator's unit test class.
@@ -20,56 +22,72 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
         /// Should fail if amount is invalid.
         /// </summary>
         /// <param name="amount">The amount.</param>
-        [Theory(DisplayName = "Should fail if amount is invalid")]
-        [InlineData(0.00)]
-        [InlineData(-1.00)]
+        [Theory()]
+        [TestCase(0.00)]
+        [TestCase(-1.00)]
         public void Should_fail_if_amount_is_invalid(double amount)
         {
             var validator = this.Build();
+            var model = new CreateInvoiceCommand
+            {
+                Amount = amount
+            };
+            var result = validator.TestValidate(model);
 
-            validator.ShouldHaveValidationErrorFor(x => x.Amount, amount);
+            result.ShouldHaveValidationErrorFor(x => x.Amount);
         }
 
         /// <summary>
         /// Should fail if amount is invalid.
         /// </summary>
         /// <param name="currency">The currency.</param>
-        [Theory(DisplayName = "Should fail if currency is invalid")]
-        [InlineData("")]
-        [InlineData(null)]
+        [Theory()]
+        [TestCase("")]
+        [TestCase(null)]
         public void Should_fail_if_currency_is_invalid(string currency)
         {
             var validator = this.Build();
+            var model = new CreateInvoiceCommand
+            {
+                Currency = currency
+            };
+            var result = validator.TestValidate(model);
 
-            validator.ShouldHaveValidationErrorFor(x => x.Currency, currency);
+            result.ShouldHaveValidationErrorFor(x => x.Currency);
         }
 
         /// <summary>
         /// Should fail if transaction identifier is missing.
         /// </summary>
         /// <param name="transactionId">The transaction identifier.</param>
-        [Theory(DisplayName = "Should fail if transaction identifier is missing")]
-        [InlineData("")]
-        [InlineData(null)]
+        [Theory()]
+        [TestCase("")]
+        [TestCase(null)]
         public void Should_fail_if_transaction_id_is_missing(string transactionId)
         {
             var validator = this.Build();
+            var model = new CreateInvoiceCommand
+            {
+                TransactionId = transactionId
+            };
+            var result = validator.TestValidate(model);
 
-            validator.ShouldHaveValidationErrorFor(x => x.TransactionId, transactionId);
+            result.ShouldHaveValidationErrorFor(x => x.TransactionId);
         }
 
         /// <summary>
         /// Should pass if command is valid.
         /// </summary>
-        [Fact(DisplayName = "Should pass if command is valid")]
+        [TestCase(TestName = "Should pass if command is valid")]
         public void Should_pass_if_command_is_valid()
         {
             var command = new CreateInvoiceCommandFaker().Generate();
             var validator = this.Build();
+            var result = validator.TestValidate(command);
 
-            validator.ShouldNotHaveValidationErrorFor(x => x.Amount, command);
-            validator.ShouldNotHaveValidationErrorFor(x => x.Currency, command);
-            validator.ShouldNotHaveValidationErrorFor(x => x.TransactionId, command);
+            result.ShouldNotHaveValidationErrorFor(x => x.Amount);
+            result.ShouldNotHaveValidationErrorFor(x => x.Currency);
+            result.ShouldNotHaveValidationErrorFor(x => x.TransactionId);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
     using Devkit.Security.Business.Users.Commands.RegisterUser;
     using Devkit.Security.Business.ViewModels;
     using Devkit.Test;
-    using Xunit;
+    using NUnit.Framework;
 
     /// <summary>
     /// The register user integration test.
@@ -34,106 +34,106 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
         /// Fails if client confirm password doesn't match password.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if client confirm password doesn't match password")]
+        [TestCase(TestName = "Fails if client confirm password doesn't match password")]
         public async Task Fail_if_client_confirm_password_doesnt_match_password()
         {
             var command = this.Build();
             command.ConfirmPassword = "SomeTestPassword123";
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Fails if client password is empty.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if client password is empty")]
+        [TestCase(TestName = "Fails if client password is empty")]
         public async Task Fail_if_client_password_is_empty()
         {
             var command = this.Build();
             command.Password = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Fails if client username is empty.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if username is empty")]
+        [TestCase(TestName = "Fails if username is empty")]
         public async Task Fail_if_client_username_is_empty()
         {
             var command = this.Build();
             command.UserName = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Fails if driver confirm password doesn't match password.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if driver confirm password doesn't match password")]
+        [TestCase(TestName = "Fails if driver confirm password doesn't match password")]
         public async Task Fail_if_driver_confirm_password_doesnt_match_password()
         {
             var command = this.Build();
             command.ConfirmPassword = "SomeTestPassword123";
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Fails if driver password is empty.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if driver password is empty")]
+        [TestCase(TestName = "Fails if driver password is empty")]
         public async Task Fail_if_driver_password_is_empty()
         {
             var command = this.Build();
             command.Password = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Fails if driver username is empty.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Fails if username is empty")]
+        [TestCase(TestName = "Fails if username is empty")]
         public async Task Fail_if_driver_username_is_empty()
         {
             var command = this.Build();
             command.UserName = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
         /// Passes if client registration was successful.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Passes if client registration was successful")]
+        [TestCase(TestName = "Passes if client registration was successful")]
         public async Task Pass_if_client_registration_was_successful()
         {
             var response = await this.PostAsync<UserVM>("/users/client/register", this.Build(), true);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         /// <summary>
         /// Passes if driver registration was successful.
         /// </summary>
         /// <returns>A task.</returns>
-        [Fact(DisplayName = "Passes if driver registration was successful")]
+        [TestCase(TestName = "Passes if driver registration was successful")]
         public async Task Pass_if_driver_registration_was_successful()
         {
             var response = await this.PostAsync<UserVM>("/users/driver/register", this.Build(), true);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
 
         /// <summary>

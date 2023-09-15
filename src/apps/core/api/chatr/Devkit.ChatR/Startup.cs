@@ -85,10 +85,10 @@ namespace Devkit.ChatR
         {
             var redisConfiguration = this.Configuration.GetSection("RedisChatR").Get<RedisConfiguration>();
 
-            services.AddSingleton<IRedisCacheClient, RedisCacheClient>();
-            services.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
+            services.AddSingleton<IRedisClient, RedisClient>();
+            services.AddSingleton<IRedisConnectionPoolManager, RedisConnectionPoolManager>();
             services.AddSingleton<ISerializer, SystemTextJsonSerializer>();
-            services.AddSingleton(provider => provider.GetRequiredService<IRedisCacheClient>().GetDbFromConfiguration());
+            services.AddSingleton(provider => provider.GetRequiredService<IRedisClient>().GetDefaultDatabase());
             services.AddSingleton(redisConfiguration);
         }
     }

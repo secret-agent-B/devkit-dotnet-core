@@ -13,7 +13,7 @@ namespace Devkit.WebAPI
     using Devkit.WebAPI.Extensions;
     using Devkit.WebAPI.Filters;
     using Devkit.WebAPI.ServiceRegistry;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Routing;
@@ -148,7 +148,7 @@ namespace Devkit.WebAPI
         /// Adds the consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        protected virtual void AddConsumers(IServiceCollectionBusConfigurator configurator)
+        protected virtual void AddConsumers(IBusRegistrationConfigurator configurator)
         {
             // do nothing...
         }

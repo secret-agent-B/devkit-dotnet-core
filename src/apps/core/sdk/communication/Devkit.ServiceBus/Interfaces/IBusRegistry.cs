@@ -6,7 +6,7 @@
 
 namespace Devkit.ServiceBus.Interfaces
 {
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
 
     /// <summary>
     /// The IServiceBusConfiguration configures message consumers for MassTransit.
@@ -17,6 +17,6 @@ namespace Devkit.ServiceBus.Interfaces
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        void RegisterConsumers(IServiceCollectionBusConfigurator configurator);
+        void RegisterConsumers(IBusRegistrationConfigurator configurator);
     }
 }

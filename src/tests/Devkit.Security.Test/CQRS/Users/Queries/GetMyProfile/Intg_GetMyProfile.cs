@@ -11,7 +11,8 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
     using Devkit.Security.Business.ViewModels;
     using Devkit.Security.Data.Models;
     using Devkit.Test;
-    using Xunit;
+
+    using NUnit.Framework;
 
     /// <summary>
     /// Intg_GetMyProfile class is the integration test for GetMyProfile.
@@ -37,8 +38,8 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
 
             var user = this.Repository.GetOneOrDefault<UserAccount>(x => x.UserName == query.UserName);
 
-            Assert.True(response.IsSuccessfulStatusCode);
-            Assert.Equal(query.UserName, response.Payload.UserName);
+            Assert.IsTrue(response.IsSuccessfulStatusCode);
+            Assert.AreEqual(query.UserName, response.Payload.UserName);
         }
     }
 }

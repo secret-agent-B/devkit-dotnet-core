@@ -8,7 +8,7 @@ namespace Devkit.FileStore.ServiceBus
 {
     using Devkit.FileStore.ServiceBus.Consumers;
     using Devkit.ServiceBus.Interfaces;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
 
     /// <summary>
     /// The FileStore API service bus registry.
@@ -20,7 +20,7 @@ namespace Devkit.FileStore.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumer<DownloadFileConsumer>();
             configurator.AddConsumer<UploadBase64ImageConsumer>();

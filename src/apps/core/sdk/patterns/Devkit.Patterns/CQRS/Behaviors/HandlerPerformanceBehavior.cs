@@ -50,7 +50,7 @@ namespace Devkit.Patterns.CQRS.Behaviors
         /// <returns>
         /// Awaitable task returning the <typeparamref name="TResponse" />.
         /// </returns>
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, [NotNull] RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             this._timer.Start();
 

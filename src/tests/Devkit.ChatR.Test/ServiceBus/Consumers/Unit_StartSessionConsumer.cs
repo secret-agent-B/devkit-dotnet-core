@@ -16,9 +16,9 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
     using Devkit.Test;
     using MassTransit.Testing;
     using Moq;
+    using NUnit.Framework;
     using StackExchange.Redis;
     using StackExchange.Redis.Extensions.Core.Abstractions;
-    using Xunit;
 
     /// <summary>
     /// Unit test for start session consumer.
@@ -28,12 +28,12 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
         /// <summary>
         /// Should be able to return user information.
         /// </summary>
-        [Fact(DisplayName = "Should be able to return user information")]
+        [TestCase(TestName = "Should be able to return user information")]
         public async Task Should_be_able_to_return_user_info()
         {
             using (var testHarness = new InMemoryTestHarness())
             {
-                var mockRedisClient = new Mock<IRedisCacheClient>();
+                var mockRedisClient = new Mock<IRedisClient>();
                 var cache = new Dictionary<string, SessionVM>();
 
                 mockRedisClient
@@ -87,8 +87,8 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
                         Topic = this.Faker.Commerce.Product()
                     });
 
-                Assert.True(await testHarness.Consumed.Any<IStartSession>());
-                Assert.True(cache.ContainsKey(id));
+                Assert.IsTrue(await testHarness.Consumed.Any<IStartSession>());
+                Assert.IsTrue(cache.ContainsKey(id));
 
                 mockRedisClient.VerifyAll();
             }

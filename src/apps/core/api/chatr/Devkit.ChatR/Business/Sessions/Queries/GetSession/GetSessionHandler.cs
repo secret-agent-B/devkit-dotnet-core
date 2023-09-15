@@ -22,14 +22,14 @@ namespace Devkit.ChatR.Business.Sessions.Queries.GetSession
         /// <summary>
         /// The cache client.
         /// </summary>
-        private readonly IRedisCacheClient _cacheClient;
+        private readonly IRedisClient _cacheClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetSessionHandler" /> class.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="cacheClient">The cache client.</param>
-        public GetSessionHandler(IRepository repository, IRedisCacheClient cacheClient)
+        public GetSessionHandler(IRepository repository, IRedisClient cacheClient)
             : base(repository)
         {
             this._cacheClient = cacheClient;
@@ -42,7 +42,7 @@ namespace Devkit.ChatR.Business.Sessions.Queries.GetSession
         /// <returns>
         /// A task.
         /// </returns>
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var sessionExist = await this._cacheClient.Db0.ExistsAsync(this.Request.SessionId);
 

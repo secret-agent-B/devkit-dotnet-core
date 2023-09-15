@@ -27,7 +27,7 @@ namespace Devkit.ChatR.Business.Sessions.Commands.PostMessage
         /// <summary>
         /// The cache client.
         /// </summary>
-        private readonly IRedisCacheClient _cacheClient;
+        private readonly IRedisClient _cacheClient;
 
         /// <summary>
         /// The configuration.
@@ -40,7 +40,7 @@ namespace Devkit.ChatR.Business.Sessions.Commands.PostMessage
         /// <param name="repository">The repository.</param>
         /// <param name="cacheClient">The cache client.</param>
         /// <param name="options">The options.</param>
-        public PostMessageHandler(IRepository repository, IRedisCacheClient cacheClient, IOptions<ChatRConfiguration> options)
+        public PostMessageHandler(IRepository repository, IRedisClient cacheClient, IOptions<ChatRConfiguration> options)
             : base(repository)
         {
             this._cacheClient = cacheClient;
@@ -54,7 +54,7 @@ namespace Devkit.ChatR.Business.Sessions.Commands.PostMessage
         /// <returns>
         /// A task.
         /// </returns>
-        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             // Check if session id is valid.
             var sessionExist = await this._cacheClient.Db0.ExistsAsync(this.Request.SessionId);
@@ -69,7 +69,6 @@ namespace Devkit.ChatR.Business.Sessions.Commands.PostMessage
             }
 
             // Check if participant is valid.
-
             var session = await this._cacheClient.Db0.GetAsync<SessionVM>(this.Request.SessionId);
             var isParticipant = session.Participants.Any(x => x.UserName == this.Request.UserName);
 
@@ -83,7 +82,6 @@ namespace Devkit.ChatR.Business.Sessions.Commands.PostMessage
             }
 
             // Add message to the session.
-
             var newMessage = new MessageVM
             {
                 Id = ObjectId.GenerateNewId().ToString(),

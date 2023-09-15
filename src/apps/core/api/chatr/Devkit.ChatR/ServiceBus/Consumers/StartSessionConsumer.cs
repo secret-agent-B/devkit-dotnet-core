@@ -28,7 +28,7 @@ namespace Devkit.ChatR.ServiceBus.Consumers
         /// <summary>
         /// The cache client.
         /// </summary>
-        private readonly IRedisCacheClient _cacheClient;
+        private readonly IRedisClient _cacheClient;
 
         /// <summary>
         /// The configuration.
@@ -40,7 +40,7 @@ namespace Devkit.ChatR.ServiceBus.Consumers
         /// </summary>
         /// <param name="cacheClient">The cache client.</param>
         /// <param name="options">The options.</param>
-        public StartSessionConsumer(IRedisCacheClient cacheClient, IOptions<ChatRConfiguration> options)
+        public StartSessionConsumer(IRedisClient cacheClient, IOptions<ChatRConfiguration> options)
         {
             this._cacheClient = cacheClient;
             this._configuration = options.Value;
@@ -53,7 +53,7 @@ namespace Devkit.ChatR.ServiceBus.Consumers
         /// <returns>
         /// A task.
         /// </returns>
-        protected async override Task ConsumeRequest(ConsumeContext<IStartSession> context)
+        protected override async Task ConsumeRequest(ConsumeContext<IStartSession> context)
         {
             var sessionExist = await this._cacheClient.Db0.ExistsAsync(context.Message.Id);
 

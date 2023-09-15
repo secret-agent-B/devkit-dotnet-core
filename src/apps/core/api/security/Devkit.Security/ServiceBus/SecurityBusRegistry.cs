@@ -8,7 +8,6 @@ namespace Devkit.Security.ServiceBus
 {
     using Devkit.ServiceBus.Interfaces;
     using MassTransit;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
 
     /// <summary>
     /// The SecurityConsumerRegistry contains consumer registration instructions for the Security API.
@@ -20,7 +19,7 @@ namespace Devkit.Security.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumersFromNamespaceContaining<SecurityBusRegistry>();
         }

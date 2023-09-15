@@ -33,7 +33,10 @@ namespace Devkit.Patterns.CQRS.Extensions
         {
             if (assemblies.Any())
             {
-                services.AddMediatR(assemblies.ToArray());
+                services.AddMediatR((config) =>
+                {
+                    config.RegisterServicesFromAssemblies(assemblies.ToArray());
+                });
 
                 services.AddTransient(typeof(IRequestPreProcessor<>), typeof(RequestLoggerBehavior<>));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
@@ -57,7 +60,10 @@ namespace Devkit.Patterns.CQRS.Extensions
         {
             if (handlers.Any())
             {
-                services.AddMediatR(handlers, configuration);
+                services.AddMediatR((config) =>
+                {
+                    config.RegisterServicesFromAssemblies(handlers.Select(x => x.Assembly).ToArray());
+                });
 
                 services.AddTransient(typeof(IRequestPreProcessor<>), typeof(RequestLoggerBehavior<>));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));

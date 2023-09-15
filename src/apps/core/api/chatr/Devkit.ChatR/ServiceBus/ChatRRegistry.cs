@@ -8,7 +8,7 @@ namespace Devkit.ChatR.ServiceBus
 {
     using Devkit.ChatR.ServiceBus.Consumers;
     using Devkit.ServiceBus.Interfaces;
-    using MassTransit.ExtensionsDependencyInjectionIntegration;
+    using MassTransit;
 
     /// <summary>
     /// The ChatR bus registry.
@@ -19,7 +19,7 @@ namespace Devkit.ChatR.ServiceBus
         /// Configure message consumers.
         /// </summary>
         /// <param name="configurator">The configurator.</param>
-        public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
+        public void RegisterConsumers(IBusRegistrationConfigurator configurator)
         {
             configurator.AddConsumer<StartSessionConsumer>();
         }

@@ -12,7 +12,8 @@ namespace Devkit.Test
     using System.Threading.Tasks;
     using Devkit.Data;
     using Newtonsoft.Json;
-    using Xunit;
+    using NUnit;
+    using NUnit.Framework;
 
     /// <summary>
     /// The base class that helps facilitate integration tests.
@@ -20,8 +21,8 @@ namespace Devkit.Test
     /// <typeparam name="T">The type of input that is being tested.</typeparam>
     /// <typeparam name="TStartup">The type of the startup.</typeparam>
     /// <seealso cref="TestBase{T}" />
-    [Trait("Category", "Integration Test")]
-    public abstract class IntegrationTestBase<T, TStartup> : TestBase<T>, IClassFixture<AppTestFixture<TStartup>>
+    [Category("Integration Test")]
+    public abstract class IntegrationTestBase<T, TStartup> : TestBase<T>
         where TStartup : class
     {
         /// <summary>
