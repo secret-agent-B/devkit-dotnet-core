@@ -24,9 +24,8 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
         /// <summary>
         /// Initializes a new instance of the <see cref="Intg_RegisterUser"/> class.
         /// </summary>
-        /// <param name="appTestFixture">The application test fixture.</param>
-        public Intg_RegisterUser(AppTestFixture<Startup> appTestFixture)
-            : base(appTestFixture)
+        public Intg_RegisterUser()
+            : base()
         {
         }
 

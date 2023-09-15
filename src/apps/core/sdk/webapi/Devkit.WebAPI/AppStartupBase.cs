@@ -136,6 +136,7 @@ namespace Devkit.WebAPI
             services.AddHealthChecks();
             services.AddRepository();
             services.AddMediatRAssemblies(this.MediatorAssemblies);
+            services.AddValidationAssemblies(this.ValidationAssemblies);
             services.AddServiceRegistry();
             services.AddSwagger(this._apiDefinition);
 

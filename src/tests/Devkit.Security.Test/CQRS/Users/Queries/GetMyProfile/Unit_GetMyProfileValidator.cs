@@ -42,12 +42,12 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
         [Theory()]
         [TestCase("a@x.com")]
         [TestCase("radriano@microsoft.com")]
-        public void Pass_if_username_is_valid()
+        public void Pass_if_username_is_valid(string userName)
         {
             var validator = this.Build();
             var model = new GetMyProfileQuery
             {
-                UserName = this.Faker.Person.Email
+                UserName = userName
             };
             var result = validator.TestValidate(model);
             result.ShouldNotHaveValidationErrorFor(x => x.UserName);

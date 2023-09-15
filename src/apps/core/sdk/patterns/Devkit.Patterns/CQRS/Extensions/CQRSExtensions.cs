@@ -11,6 +11,7 @@ namespace Devkit.Patterns.CQRS.Extensions
     using System.Linq;
     using System.Reflection;
     using Devkit.Patterns.CQRS.Behaviors;
+    using FluentValidation;
     using FluentValidation.AspNetCore;
     using MediatR;
     using MediatR.Pipeline;
@@ -85,9 +86,7 @@ namespace Devkit.Patterns.CQRS.Extensions
             if (assemblies.Any())
             {
                 services
-                    .AddValidationAssemblies(assemblies)
-                    .AddFluentValidationAutoValidation()
-                    .AddFluentValidationClientsideAdapters();
+                    .AddValidatorsFromAssemblies(assemblies);
             }
 
             return services;

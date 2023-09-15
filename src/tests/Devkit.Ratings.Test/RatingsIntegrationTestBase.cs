@@ -17,9 +17,8 @@ namespace Devkit.Ratings.Test
         /// <summary>
         /// Initializes a new instance of the <see cref="RatingsIntegrationTestBase{TRequest}"/> class.
         /// </summary>
-        /// <param name="testFixture">The application test fixture.</param>
-        public RatingsIntegrationTestBase(AppTestFixture<Startup> testFixture)
-            : base(testFixture)
+        public RatingsIntegrationTestBase()
+            : base()
         {
         }
 

@@ -22,9 +22,8 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
         /// <summary>
         /// Initializes a new instance of the <see cref="Intg_GetMyProfile"/> class.
         /// </summary>
-        /// <param name="testFixture">The application test fixture.</param>
-        public Intg_GetMyProfile(AppTestFixture<Startup> testFixture)
-            : base(testFixture)
+        public Intg_GetMyProfile()
+            : base()
         {
         }
 

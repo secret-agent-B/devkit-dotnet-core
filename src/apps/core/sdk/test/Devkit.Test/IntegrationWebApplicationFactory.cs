@@ -23,7 +23,7 @@ namespace Devkit.Test
     /// </summary>
     /// <typeparam name="TStartup">The type of the startup.</typeparam>
     /// <seealso cref="WebApplicationFactory{TStartup}" />
-    public class AppTestFixture<TStartup> : WebApplicationFactory<TStartup>
+    public class IntegrationWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
         where TStartup : class
     {
         /// <summary>
@@ -37,9 +37,9 @@ namespace Devkit.Test
         private Action<IServiceCollection> _configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AppTestFixture{TStartup}"/> class.
+        /// Initializes a new instance of the <see cref="IntegrationWebApplicationFactory{TStartup}"/> class.
         /// </summary>
-        public AppTestFixture()
+        public IntegrationWebApplicationFactory()
         {
             this._runner = MongoDbRunner.Start();
 
