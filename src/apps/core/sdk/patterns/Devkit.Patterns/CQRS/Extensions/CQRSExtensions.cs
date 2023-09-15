@@ -80,14 +80,17 @@ namespace Devkit.Patterns.CQRS.Extensions
         /// <param name="builder">The builder.</param>
         /// <param name="assemblies">The assemblies.</param>
         /// <returns>An MVC builder instance.</returns>
-        public static IMvcBuilder AddValidationAssemblies(this IMvcBuilder builder, IEnumerable<Assembly> assemblies)
+        public static IServiceCollection AddValidationAssemblies(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             if (assemblies.Any())
             {
-                builder.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(assemblies));
+                services
+                    .AddValidationAssemblies(assemblies)
+                    .AddFluentValidationAutoValidation()
+                    .AddFluentValidationClientsideAdapters();
             }
 
-            return builder;
+            return services;
         }
     }
 }

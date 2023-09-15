@@ -118,7 +118,7 @@ namespace Devkit.WebAPI
         /// <param name="services">The services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var mvcBuilder = services
+            services
                 .AddMvc(options =>
                 {
                     options.Filters.Add(typeof(PipelineFilterAttribute));
@@ -138,8 +138,6 @@ namespace Devkit.WebAPI
             services.AddMediatRAssemblies(this.MediatorAssemblies);
             services.AddServiceRegistry();
             services.AddSwagger(this._apiDefinition);
-
-            mvcBuilder.AddValidationAssemblies(this.ValidationAssemblies);
 
             this.CustomConfigureServices(services);
         }
