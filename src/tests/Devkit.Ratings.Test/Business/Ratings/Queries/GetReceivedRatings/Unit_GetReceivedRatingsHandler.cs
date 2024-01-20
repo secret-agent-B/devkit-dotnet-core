@@ -29,13 +29,13 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
             var (handler, query) = this.Build();
             var response = await handler.Handle(query, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.AreEqual(1, response.Items.Select(x => x.ReceiverUserName).Count());
-            Assert.AreEqual(query.ReceiverUserName, response.Items.First().ReceiverUserName);
+            Assert.That(response.IsSuccessful, Is.True);
+            Assert.That(response.Items.Select(x => x.ReceiverUserName).Count(), Is.EqualTo(1));
+            Assert.That(response.Items.First().ReceiverUserName, Is.EqualTo(query.ReceiverUserName));
 
             foreach (var responseItem in response.Items)
             {
-                Assert.IsTrue(responseItem.CreatedOn >= query.StartDate && responseItem.CreatedOn <= query.EndDate);
+                Assert.That(responseItem.CreatedOn >= query.StartDate && responseItem.CreatedOn <= query.EndDate, Is.True);
             }
         }
 

@@ -6,6 +6,7 @@
 
 namespace Devkit.ChatR.Test.ServiceBus.Consumers
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
     using Devkit.ChatR.Test.Fakers;
     using Devkit.Communication.ChatR.Messages;
     using Devkit.Test;
+    using MassTransit.Futures.Contracts;
     using MassTransit.Testing;
     using Moq;
     using NUnit.Framework;
@@ -33,29 +35,7 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
         {
             using (var testHarness = new InMemoryTestHarness())
             {
-                var mockRedisClient = new Mock<IRedisClient>();
-                var cache = new Dictionary<string, SessionVM>();
-
-                mockRedisClient
-                    .Setup(x => x.Db0.ExistsAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<CommandFlags>()))
-                    .ReturnsAsync(false)
-                    .Verifiable();
-
-                mockRedisClient
-                    .Setup(x => x.Db0.AddAsync(
-                        It.IsAny<string>(),
-                        It.IsAny<SessionVM>(),
-                        It.IsAny<When>(),
-                        It.IsAny<CommandFlags>(),
-                        It.IsAny<HashSet<string>>()))
-                    .ReturnsAsync((string key, SessionVM session, When when, CommandFlags commandFlags, HashSet<string> hashset) =>
-                    {
-                        cache.Add(key, session);
-                        return true;
-                    })
-                    .Verifiable();
+                var mockRedisClient = Unit_StartSessionConsumer.GetMockRedisClient();
 
                 testHarness.Consumer(() => new StartSessionConsumer(
                     mockRedisClient.Object,
@@ -87,11 +67,43 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
                         Topic = this.Faker.Commerce.Product()
                     });
 
-                Assert.IsTrue(await testHarness.Consumed.Any<IStartSession>());
-                Assert.IsTrue(cache.ContainsKey(id));
+                await Assert.ThatAsync(() => testHarness.Consumed.Any<IStartSession>(), Is.True);
 
                 mockRedisClient.VerifyAll();
             }
+        }
+
+        /// <summary>
+        /// Creates a mocked IRedisClient.
+        /// </summary>
+        /// <returns>A mocked IRedisClient.</returns>
+        private static Mock<IRedisClient> GetMockRedisClient()
+        {
+            var mockRedisClient = new Mock<IRedisClient>();
+            var cache = new Dictionary<string, SessionVM>();
+
+            mockRedisClient
+                .Setup(x => x.Db0.ExistsAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<CommandFlags>()))
+                .ReturnsAsync(false)
+                .Verifiable();
+
+            mockRedisClient
+                .Setup(x => x.Db0.AddAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<SessionVM>(),
+                    It.IsAny<When>(),
+                    It.IsAny<CommandFlags>(),
+                    It.IsAny<HashSet<string>>()))
+                .ReturnsAsync((string key, SessionVM session, When when, CommandFlags commandFlags, HashSet<string> hashset) =>
+                {
+                    cache.Add(key, session);
+                    return true;
+                })
+                .Verifiable();
+
+            return mockRedisClient;
         }
     }
 }

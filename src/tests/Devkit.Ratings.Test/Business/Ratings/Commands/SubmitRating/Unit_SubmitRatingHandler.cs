@@ -32,12 +32,13 @@ namespace Devkit.Ratings.Test.Business.Ratings.Commands.SubmitRating
             var (handler, command) = this.Build();
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.AreEqual(response.Value, command.Value);
-            Assert.AreEqual(response.AuthorUserName, command.AuthorUserName);
-            Assert.AreEqual(response.ReceiverUserName, command.ReceiverUserName);
-            Assert.AreEqual(response.Summary, command.Summary);
-            Assert.AreEqual(response.TransactionId, command.TransactionId);
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.IsSuccessful, Is.True);
+            Assert.That(response.Value, Is.EqualTo(command.Value));
+            Assert.That(response.AuthorUserName, Is.EqualTo(command.AuthorUserName));
+            Assert.That(response.ReceiverUserName, Is.EqualTo(command.ReceiverUserName));
+            Assert.That(response.Summary, Is.EqualTo(command.Summary));
+            Assert.That(response.TransactionId, Is.EqualTo(command.TransactionId));
         }
 
         /// <summary>

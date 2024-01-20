@@ -33,12 +33,12 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
             var (command, handler) = this.Build();
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.False(response.IsDeleted);
-            Assert.IsNotEmpty(response.Id);
-            Assert.NotNull(response.Timestamp);
-            Assert.AreEqual(command.UserName, response.AuthorUserName);
-            Assert.AreEqual(command.Message, response.Message);
+            Assert.That(response.IsSuccessful, Is.True);
+            Assert.That(response.IsDeleted, Is.False);
+            Assert.That(response.Id, Is.Not.Empty);
+            Assert.That(response.Timestamp, Is.Not.Null);
+            Assert.That(command.UserName, Is.EqualTo(response.AuthorUserName));
+            Assert.That(command.Message, Is.EqualTo(response.Message));
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
 
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.False(response.IsSuccessful);
-            Assert.IsTrue(response.Exceptions.ContainsKey(nameof(command.SessionId)));
+            Assert.That(response.IsSuccessful, Is.False);
+            Assert.That(response.Exceptions.ContainsKey(nameof(command.SessionId)), Is.True);
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Devkit.ChatR.Test.Business.Sessions.Commands.PostMessage
 
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.False(response.IsSuccessful);
-            Assert.IsTrue(response.Exceptions.ContainsKey(nameof(command.UserName)));
+            Assert.That(response.IsSuccessful, Is.False);
+            Assert.That(response.Exceptions.ContainsKey(nameof(command.UserName)), Is.True);
         }
 
         /// <summary>

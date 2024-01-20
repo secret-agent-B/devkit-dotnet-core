@@ -39,25 +39,25 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
             var (query, handler) = this.Build();
             var response = await handler.Handle(query, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.AreEqual(query.UserName, response.UserName);
-            Assert.AreEqual(query.UserName, response.Email);
-            Assert.AreNotEqual(default, response.FirstName);
-            Assert.AreNotEqual(default, response.MiddleName);
-            Assert.AreNotEqual(default, response.LastName);
-            Assert.AreNotEqual(default, response.Address1);
-            Assert.AreNotEqual(default, response.Address2);
-            Assert.AreNotEqual(default, response.City);
-            Assert.AreNotEqual(default, response.Province);
-            Assert.AreNotEqual(default, response.Country);
-            Assert.AreNotEqual(default, response.ZipCode);
-            Assert.IsNotEmpty(response.IdentificationCards);
+            Assert.That(response.IsSuccessful, Is.True);
+            Assert.That(query.UserName, Is.EqualTo(response.UserName));
+            Assert.That(query.UserName, Is.EqualTo(response.Email));
+            Assert.That(response.FirstName, Is.Not.Default);
+            Assert.That(response.MiddleName, Is.Not.Default);
+            Assert.That(response.LastName, Is.Not.Default);
+            Assert.That(response.Address1, Is.Not.Default);
+            Assert.That(response.Address2, Is.Not.Default);
+            Assert.That(response.City, Is.Not.Default);
+            Assert.That(response.Province, Is.Not.Default);
+            Assert.That(response.Country, Is.Not.Default);
+            Assert.That(response.ZipCode, Is.Not.Default);
+            Assert.That(response.IdentificationCards, Is.Not.Empty);
 
             foreach (var responseIdentificationCard in response.IdentificationCards)
             {
-                Assert.AreNotEqual(default, responseIdentificationCard.Number);
-                Assert.AreNotEqual(default, responseIdentificationCard.Type);
-                Assert.AreNotEqual(default, responseIdentificationCard.ImageId);
+                Assert.That(responseIdentificationCard.Number, Is.Not.Default);
+                Assert.That(responseIdentificationCard.Type, Is.Not.Default);
+                Assert.That(responseIdentificationCard.ImageId, Is.Not.Default);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<UserSecretsId>0e14a381-184b-41a4-9b18-5ad546bac50c</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>..\..\..\..\..</DockerfileContext>
@@ -23,7 +23,7 @@
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
-	  <PackageReference Include="StackExchange.Redis" Version="2.6.122" />
+	  <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
+	  <PackageReference Include="StackExchange.Redis" Version="2.7.17" />
 	</ItemGroup>
 </Project>
