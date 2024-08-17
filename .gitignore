@@ -361,3 +361,6 @@ FodyWeavers.xsd
 
 # Rider files
 .idea/
+
+# Test database
+*.db

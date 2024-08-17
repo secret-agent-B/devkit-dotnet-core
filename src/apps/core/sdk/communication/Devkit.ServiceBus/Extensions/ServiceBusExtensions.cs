@@ -32,11 +32,16 @@ namespace Devkit.ServiceBus.Extensions
         public static IServiceCollection AddServiceBus<TConsumerRegistry>(this IServiceCollection services)
             where TConsumerRegistry : class, IBusRegistry
         {
+            var serviceBusType = Environment.GetEnvironmentVariable("SERVICE_BUS_TYPE") ?? "none";
+
+            if (serviceBusType == "none")
+            {
+                return services;
+            }
+
             // Adding this into the integration test as middleware will cause the test to stop responding.
             services.AddSingleton<IHostedService, BusHostedService>();
             services.AddSingleton<IBusRegistry, TConsumerRegistry>();
-
-            var serviceBusType = Environment.GetEnvironmentVariable("SERVICE_BUS_TYPE") ?? "none";
 
             switch (serviceBusType.ToLower())
             {
