@@ -18,19 +18,16 @@ namespace Devkit.Security.Stores
     /// The CustomUserStore provides additional functionality for pulling users form the database.
     /// </summary>
     /// <seealso cref="UserStore{UserAccount, UserRole, ObjectId}" />
-    public class CustomUserStore : UserStore<UserAccount, UserRole, ObjectId>
+    public class CustomUserStore : UserStore<UserAccount, UserRole>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomUserStore"/> class.
         /// </summary>
         /// <param name="userCollection">The user collection.</param>
-        /// <param name="roleStore">The role store.</param>
+        /// <param name="roleCollection">The role store.</param>
         /// <param name="describer">Identity error describer.</param>
-        public CustomUserStore(
-            IMongoCollection<UserAccount> userCollection,
-            IMongoCollection<UserRole> roleStore,
-            IdentityErrorDescriber describer)
-            : base(userCollection, roleStore, describer)
+        public CustomUserStore(IMongoCollection<UserAccount> userCollection, IMongoCollection<UserRole> roleCollection, IdentityErrorDescriber describer)
+            : base(userCollection, roleCollection, describer)
         {
         }
 

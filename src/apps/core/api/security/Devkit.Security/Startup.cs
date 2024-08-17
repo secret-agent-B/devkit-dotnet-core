@@ -84,11 +84,11 @@ namespace Devkit.Security
                 .AddIdentityMongoDbProvider<UserAccount, UserRole>(
                     identityOptions =>
                     {
-                        identityOptions.Password.RequiredLength = 6;
-                        identityOptions.Password.RequireLowercase = true;
-                        identityOptions.Password.RequireUppercase = true;
-                        identityOptions.Password.RequireNonAlphanumeric = true;
-                        identityOptions.Password.RequireDigit = true;
+                        //identityOptions.Password.RequiredLength = 6;
+                        //identityOptions.Password.RequireLowercase = true;
+                        //identityOptions.Password.RequireUppercase = true;
+                        //identityOptions.Password.RequireNonAlphanumeric = true;
+                        //identityOptions.Password.RequireDigit = true;
                     },
                     mongoIdentityOptions =>
                     {

@@ -8,6 +8,7 @@ namespace Devkit.Security.Data.Models
 {
     using System;
     using AspNetCore.Identity.Mongo.Model;
+    using MongoDB.Bson;
 
     /// <summary>
     /// A user's account information.
