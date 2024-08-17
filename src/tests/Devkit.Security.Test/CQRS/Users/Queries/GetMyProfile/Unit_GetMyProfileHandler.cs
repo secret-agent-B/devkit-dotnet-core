@@ -39,9 +39,9 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
             var (query, handler) = this.Build();
             var response = await handler.Handle(query, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.AreEqual(query.UserName, response.UserName);
-            Assert.AreEqual(query.UserName, response.Email);
+            Assert.That(response.IsSuccessful);
+            Assert.Equals(query.UserName, response.UserName);
+            Assert.Equals(query.UserName, response.Email);
             Assert.AreNotEqual(default, response.FirstName);
             Assert.AreNotEqual(default, response.MiddleName);
             Assert.AreNotEqual(default, response.LastName);

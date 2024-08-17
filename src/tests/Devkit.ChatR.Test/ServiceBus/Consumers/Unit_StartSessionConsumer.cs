@@ -87,8 +87,8 @@ namespace Devkit.ChatR.Test.ServiceBus.Consumers
                         Topic = this.Faker.Commerce.Product()
                     });
 
-                Assert.IsTrue(await testHarness.Consumed.Any<IStartSession>());
-                Assert.IsTrue(cache.ContainsKey(id));
+                Assert.That(await testHarness.Consumed.Any<IStartSession>());
+                Assert.That(cache.ContainsKey(id));
 
                 mockRedisClient.VerifyAll();
             }

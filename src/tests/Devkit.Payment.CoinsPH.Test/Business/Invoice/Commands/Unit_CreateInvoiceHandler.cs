@@ -37,16 +37,16 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
 
             var response = await handler.Handle(command, CancellationToken.None);
 
-            Assert.IsTrue(response.IsSuccessful);
-            Assert.False(string.IsNullOrEmpty(response.InvoiceId));
-            Assert.AreEqual(command.TransactionId, response.TransactionId);
-            Assert.AreEqual(command.Amount, response.Amount);
-            Assert.AreEqual(command.Amount, response.AmountDue);
-            Assert.AreEqual(command.Currency, response.Currency);
-            Assert.NotNull(response.PaymentUrl);
-            Assert.NotNull(response.CreatedAt);
-            Assert.NotNull(response.UpdatedAt);
-            Assert.NotNull(response.ExpiresAt);
+            Assert.That(response.IsSuccessful);
+            Assert.That(string.IsNullOrEmpty(response.InvoiceId), Is.False);
+            Assert.Equals(command.TransactionId, response.TransactionId);
+            Assert.Equals(command.Amount, response.Amount);
+            Assert.Equals(command.Amount, response.AmountDue);
+            Assert.Equals(command.Currency, response.Currency);
+            Assert.That(response.PaymentUrl, Is.Not.Null);
+            Assert.That(response.CreatedAt, Is.Not.Null);
+            Assert.That(response.UpdatedAt, Is.Not.Null);
+            Assert.That(response.ExpiresAt, Is.Not.Null);
         }
 
         /// <summary>

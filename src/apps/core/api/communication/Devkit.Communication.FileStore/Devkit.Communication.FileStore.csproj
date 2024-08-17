@@ -4,7 +4,7 @@
         <Configurations>Debug;Release;Test</Configurations>
     </PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+	  <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
 	</ItemGroup>
 	<ItemGroup>
         <ProjectReference Include="..\..\..\sdk\communication\Devkit.ServiceBus\Devkit.ServiceBus.csproj" />

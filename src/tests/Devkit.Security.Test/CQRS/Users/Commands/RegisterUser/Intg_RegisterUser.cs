@@ -40,7 +40,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.ConfirmPassword = "SomeTestPassword123";
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.Password = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.UserName = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/client/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.ConfirmPassword = "SomeTestPassword123";
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.Password = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
             command.UserName = string.Empty;
 
             var response = await this.PostAsync<UserVM>("/users/driver/register", command);
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equals(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
         public async Task Pass_if_client_registration_was_successful()
         {
             var response = await this.PostAsync<UserVM>("/users/client/register", this.Build(), true);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equals(HttpStatusCode.OK, response.StatusCode);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Devkit.Security.Test.CQRS.Users.Commands.RegisterUser
         public async Task Pass_if_driver_registration_was_successful()
         {
             var response = await this.PostAsync<UserVM>("/users/driver/register", this.Build(), true);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equals(HttpStatusCode.OK, response.StatusCode);
         }
 
         /// <summary>

@@ -37,8 +37,8 @@ namespace Devkit.Security.Test.CQRS.Users.Queries.GetMyProfile
 
             var user = this.Repository.GetOneOrDefault<UserAccount>(x => x.UserName == query.UserName);
 
-            Assert.IsTrue(response.IsSuccessfulStatusCode);
-            Assert.AreEqual(query.UserName, response.Payload.UserName);
+            Assert.That(response.IsSuccessfulStatusCode);
+            Assert.Equals(query.UserName, response.Payload.UserName);
         }
     }
 }
