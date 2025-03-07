@@ -16,7 +16,7 @@ DMF provides a base framework for developing microservices using .NET Core. The 
 
 ## Run the demo APIs
 
-You'll need **Dockers** :) installed.
+You'll need **Docker** installed.
 
 1. Open up your command line on the root directory of the project
 2. Enter `cd infrastructure`
