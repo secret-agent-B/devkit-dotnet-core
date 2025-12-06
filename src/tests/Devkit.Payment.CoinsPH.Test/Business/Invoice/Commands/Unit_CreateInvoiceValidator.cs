@@ -10,7 +10,6 @@ namespace Devkit.Payment.CoinsPH.Test.Business.Invoice.Commands
     using FluentValidation.TestHelper;
     using Devkit.Payment.CoinsPH.Business.Invoice.Commands.CreateInvoice;
     using NUnit.Framework;
-    using static MongoDB.Driver.WriteConcern;
     using System.Transactions;
 
     /// <summary>

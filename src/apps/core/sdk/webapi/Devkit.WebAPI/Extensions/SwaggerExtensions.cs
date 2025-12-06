@@ -13,7 +13,6 @@ namespace Devkit.WebAPI.Extensions
     using Devkit.WebAPI;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.OpenApi.Models;
 
     /// <summary>
     /// The Open API 3 extension methods class.
@@ -54,17 +53,9 @@ namespace Devkit.WebAPI.Extensions
                 return services;
             }
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
+            // Register the Swagger generator
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc(
-                    version,
-                    new OpenApiInfo
-                    {
-                        Title = title,
-                        Description = description
-                    });
-
                 // Add documentation into Swagger.
                 var xmlFile = $"{Assembly.GetEntryAssembly()?.GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -121,14 +112,12 @@ namespace Devkit.WebAPI.Extensions
                 return app;
             }
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(setupAction =>
             {
-                setupAction.SwaggerEndpoint($"/swagger/{version}/swagger.json", title);
+                // Default to v1 document name when no explicit OpenApiInfo is provided
+                setupAction.SwaggerEndpoint($"/swagger/v1/swagger.json", title);
             });
 
             return app;
