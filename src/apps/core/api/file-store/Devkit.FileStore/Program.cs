@@ -8,8 +8,11 @@ namespace Devkit.FileStore
 {
     using Devkit.Metrics.Extensions;
     using Devkit.WebAPI.Extensions;
-    using Microsoft.AspNetCore;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Serilog;
 
     /// <summary>
     /// The runtime class for this API.
@@ -22,22 +25,24 @@ namespace Devkit.FileStore
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args)
-                .ConfigureSerilog()
-                .Build()
-                .Run();
+            var builder = WebApplication.CreateBuilder(args);
+            
+            builder.Configuration.ReferenceConfigFiles();
+            builder.WebHost.ConfigureKestrel(options => options.SetupHttps());
+            
+            // Configure Serilog
+            builder.Host.ConfigureSerilog();
+            
+            // Configure services using Startup
+            var startup = new Startup(builder.Environment, builder.Configuration);
+            startup.ConfigureServices(builder.Services);
+            
+            var app = builder.Build();
+            
+            // Configure middleware
+            startup.Configure(app);
+            
+            app.Run();
         }
-
-        /// <summary>
-        /// Creates the host builder.
-        /// </summary>
-        /// <param name="args">The arguments.</param>
-        /// <returns>An IHostBuilder.</returns>
-        private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost
-                .CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, config) => config.ReferenceConfigFiles())
-                .UseKestrel((context, options) => options.SetupHttps())
-                .UseStartup<Startup>();
     }
 }

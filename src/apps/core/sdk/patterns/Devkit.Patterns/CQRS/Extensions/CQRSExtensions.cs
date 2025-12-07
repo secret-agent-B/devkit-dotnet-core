@@ -12,7 +12,6 @@ namespace Devkit.Patterns.CQRS.Extensions
     using System.Reflection;
     using Devkit.Patterns.CQRS.Behaviors;
     using FluentValidation;
-    using FluentValidation.AspNetCore;
     using MediatR;
     using MediatR.Pipeline;
     using Microsoft.Extensions.DependencyInjection;

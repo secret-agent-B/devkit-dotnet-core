@@ -15,8 +15,9 @@ namespace Devkit.Test
     using Microsoft.AspNetCore.Mvc.Testing;
     using Microsoft.AspNetCore.TestHost;
     using Microsoft.Extensions.DependencyInjection;
-    using Mongo2Go;
     using Serilog;
+    using LiteDB;
+    using Devkit.Data.Interfaces;
 
     /// <summary>
     /// Application test fixture to generate the test host.
@@ -27,9 +28,9 @@ namespace Devkit.Test
         where TStartup : class
     {
         /// <summary>
-        /// The runner.
+        /// The database.
         /// </summary>
-        private readonly MongoDbRunner _runner;
+        private readonly LiteDatabase _db;
 
         /// <summary>
         /// The configuration.
@@ -41,11 +42,11 @@ namespace Devkit.Test
         /// </summary>
         public IntegrationWebApplicationFactory()
         {
-            this._runner = MongoDbRunner.Start();
+            this._db = new LiteDatabase(":memory:");
 
             this.RepositoryConfiguration = new RepositoryOptions
             {
-                ConnectionString = this._runner.ConnectionString,
+                ConnectionString = "Filename=:memory:",
                 DatabaseName = Guid.NewGuid().ToString("N")
             };
         }
@@ -79,6 +80,7 @@ namespace Devkit.Test
                     this._configuration?.Invoke(services);
 
                     services.AddSingleton(Log.Logger);
+                    services.AddSingleton<IRepository>(new LiteDbRepository(this._db));
 
                     services
                         .AddMassTransit(x =>
@@ -132,7 +134,7 @@ namespace Devkit.Test
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            this._runner.Dispose();
+            this._db.Dispose();
         }
     }
 }

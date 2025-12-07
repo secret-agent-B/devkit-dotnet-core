@@ -50,7 +50,10 @@ namespace Devkit.WebAPI.Extensions
             {
                 options.ConfigureHttpsDefaults(httpOptions =>
                 {
-                    httpOptions.ServerCertificate = new X509Certificate2(sslCert, Environment.GetEnvironmentVariable("SSL_PASSWORD"));
+                    var password = Environment.GetEnvironmentVariable("SSL_PASSWORD");
+                    httpOptions.ServerCertificate = string.IsNullOrEmpty(password)
+                        ? X509CertificateLoader.LoadCertificateFromFile(sslCert)
+                        : X509CertificateLoader.LoadPkcs12FromFile(sslCert, password);
                     options.Listen(IPAddress.Loopback, 443);
                 });
             }

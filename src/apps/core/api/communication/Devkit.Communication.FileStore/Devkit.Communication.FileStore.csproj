@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release;Test</Configurations>
     </PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+	  <PackageReference Include="System.Drawing.Common" Version="10.0.0" />
 	</ItemGroup>
 	<ItemGroup>
         <ProjectReference Include="..\..\..\sdk\communication\Devkit.ServiceBus\Devkit.ServiceBus.csproj" />
