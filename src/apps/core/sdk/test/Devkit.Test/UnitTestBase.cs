@@ -8,7 +8,7 @@ namespace Devkit.Test
 {
     using System;
     using Devkit.Data;
-    using Mongo2Go;
+    using LiteDB;
     using NUnit.Framework;
 
     /// <summary>
@@ -20,9 +20,9 @@ namespace Devkit.Test
     public abstract class UnitTestBase<T> : TestBase<T>
     {
         /// <summary>
-        /// The runner.
+        /// The database.
         /// </summary>
-        private readonly MongoDbRunner _runner;
+        private readonly LiteDatabase _db;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitTestBase{T}" /> class.
@@ -31,12 +31,8 @@ namespace Devkit.Test
             : base()
         {
             // setup the database.
-            this._runner = MongoDbRunner.Start();
-            this.Repository = new Repository(new RepositoryOptions
-            {
-                ConnectionString = this._runner.ConnectionString,
-                DatabaseName = Guid.NewGuid().ToString("N")
-            });
+            this._db = new LiteDatabase(":memory:");
+            this.Repository = new LiteDbRepository(this._db);
 
             // seed the database.
             this.SeedDatabase();
@@ -50,7 +46,7 @@ namespace Devkit.Test
         {
             base.Dispose(disposing);
 
-            this._runner.Dispose();
+            this._db.Dispose();
         }
     }
 }

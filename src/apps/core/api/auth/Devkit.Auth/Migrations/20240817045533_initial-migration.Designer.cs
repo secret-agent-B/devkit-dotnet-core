@@ -12,7 +12,7 @@ namespace Devkit.Auth.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20240817045533_initial-migration")]
-    partial class initialmigration
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
