@@ -74,56 +74,39 @@ namespace Devkit.Test
         /// <param name="builder">The <see cref="IWebHostBuilder" /> for the application.</param>
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder
-                .ConfigureTestServices(services =>
-                {
-                    this._configuration?.Invoke(services);
-
-                    services.AddSingleton(Log.Logger);
-                    services.AddSingleton<IRepository>(new LiteDbRepository(this._db));
-
-                    services
-                        .AddMassTransit(x =>
-                        {
-                            var registry = services.BuildServiceProvider().GetService<IBusRegistry>();
-
-                            registry?.RegisterConsumers(x);
-
-                            x.UsingInMemory((context, cfg) =>
-                            {
-                                cfg.ConcurrentMessageLimit = 100;
-                                cfg.ConfigureEndpoints(context);
-                            });
-                        });
-
-                    // Needed for transfering files within the ecosystem.
-                    services.AddSingleton<IMessageDataRepository, InMemoryMessageDataRepository>();
-                });
-        }
-
-        /// <summary>
-        /// Creates a <see cref="IWebHostBuilder" /> used to set up <see cref="TestServer" />.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="IWebHostBuilder" /> instance.
-        /// </returns>
-        /// <remarks>
-        /// The default implementation of this method looks for a <c>public static IWebHostBuilder CreateWebHostBuilder(string[] args)</c>
-        /// method defined on the entry point of the assembly of TEntryPoint and invokes it passing an empty string
-        /// array as arguments.
-        /// </remarks>
-        protected override IWebHostBuilder CreateWebHostBuilder()
-        {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
             Environment.SetEnvironmentVariable("ENABLE_SERVICE_REGISTRY", "false");
             Environment.SetEnvironmentVariable("ENABLE_SWAGGER", "false");
             Environment.SetEnvironmentVariable("SERVICE_BUS_TYPE", "in-memory");
 
-            return base.CreateWebHostBuilder()
-                .ConfigureServices(services =>
+            builder.ConfigureServices(services =>
+            {
+                services.AddSingleton(this.RepositoryConfiguration);
+            });
+
+            builder.ConfigureTestServices(services =>
+            {
+                _configuration?.Invoke(services);
+
+                services.AddSingleton(Log.Logger);
+                services.AddSingleton<IRepository>(new LiteDbRepository(_db));
+
+                services.AddMassTransit(x =>
                 {
-                    services.AddSingleton(this.RepositoryConfiguration);
+                    var sp = services.BuildServiceProvider();
+                    var registry = sp.GetService<IBusRegistry>();
+
+                    registry?.RegisterConsumers(x);
+
+                    x.UsingInMemory((context, cfg) =>
+                    {
+                        cfg.ConcurrentMessageLimit = 100;
+                        cfg.ConfigureEndpoints(context);
+                    });
                 });
+
+                services.AddSingleton<IMessageDataRepository, InMemoryMessageDataRepository>();
+            });
         }
 
         /// <summary>

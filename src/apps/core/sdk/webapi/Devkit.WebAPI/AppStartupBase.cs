@@ -86,30 +86,21 @@ namespace Devkit.WebAPI
         /// Configures the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        public void Configure(IApplicationBuilder app)
+        public void Configure(WebApplication app)
         {
-            if (this.WebHostEnvironment.IsDevelopment())
+            if (WebHostEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseStaticFiles();
             app.UseHealthChecks("/health");
-            app.UseSwagger(this._apiDefinition);
+            app.UseSwagger(_apiDefinition);
 
-            // UseRouting adds route matching to the middleware pipeline.
-            // This middleware looks at the set of endpoints defined in the app,
-            // and selects the best match based on the request.
-            app.UseRouting();
+            CustomConfigure(app);
 
-            this.CustomConfigure(app);
-
-            // UseEndpoints adds endpoint execution to the middleware pipeline. It runs the delegate associated with the selected endpoint.
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapDefaultControllerRoute();
-                this.CustomEndpoints(endpoints);
-            });
+            app.MapControllers();
+            CustomEndpoints(app);
         }
 
         /// <summary>
@@ -119,7 +110,7 @@ namespace Devkit.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc(options =>
+                .AddControllers(options =>
                 {
                     options.Filters.Add(typeof(PipelineFilterAttribute));
                 })
@@ -128,7 +119,8 @@ namespace Devkit.WebAPI
                     options.SerializerSettings.Formatting = Formatting.Indented;
                     options.SerializerSettings.TypeNameHandling = TypeNameHandling.None;
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    options.SerializerSettings.Converters = new JsonConverter[] {
+                    options.SerializerSettings.Converters = new JsonConverter[]
+                    {
                         new StringEnumConverter(new CamelCaseNamingStrategy())
                     };
                 });
@@ -168,7 +160,7 @@ namespace Devkit.WebAPI
         /// Add custom endpoints.
         /// </summary>
         /// <param name="endpointBuilder">The endpoint builder.</param>
-        protected virtual void CustomEndpoints(IEndpointRouteBuilder endpointBuilder)
+        protected virtual void CustomEndpoints(IEndpointRouteBuilder endpoints)
         {
             // do nothing...
         }
