@@ -6,8 +6,6 @@
 
 namespace Logistics.Store.API
 {
-    using Devkit.Payment.CoinsPH;
-    using Devkit.Payment.CoinsPH.Extensions;
     using Devkit.ServiceBus.Extensions;
     using Devkit.WebAPI;
     using Logistics.Store.API.ServiceBus;
@@ -31,10 +29,8 @@ namespace Logistics.Store.API
             : base(env, configuration)
         {
             this.MediatorAssemblies.Add(typeof(Startup).Assembly);
-            this.MediatorAssemblies.Add(typeof(CoinsPHService).Assembly);
 
             this.ValidationAssemblies.Add(typeof(Startup).Assembly);
-            this.ValidationAssemblies.Add(typeof(CoinsPHService).Assembly);
         }
 
         /// <summary>
@@ -51,7 +47,6 @@ namespace Logistics.Store.API
         /// <param name="services">The services.</param>
         protected override void CustomConfigureServices(IServiceCollection services)
         {
-            services.AddCoinsPH();
             services.AddServiceBus<StoreBusRegistry>();
         }
     }

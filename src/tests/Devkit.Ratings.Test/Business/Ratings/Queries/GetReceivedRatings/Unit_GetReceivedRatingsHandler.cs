@@ -30,8 +30,8 @@ namespace Devkit.Ratings.Test.Business.Ratings.Queries.GetReceivedRatings
             var response = await handler.Handle(query, CancellationToken.None);
 
             Assert.That(response.IsSuccessful);
-            Assert.Equals(1, response.Items.Select(x => x.ReceiverUserName).Count());
-            Assert.Equals(query.ReceiverUserName, response.Items.First().ReceiverUserName);
+            Assert.That(response.Items.Select(x => x.ReceiverUserName).Distinct().Count(), Is.EqualTo(1));
+            Assert.That(response.Items.First().ReceiverUserName, Is.EqualTo(query.ReceiverUserName));
 
             foreach (var responseItem in response.Items)
             {

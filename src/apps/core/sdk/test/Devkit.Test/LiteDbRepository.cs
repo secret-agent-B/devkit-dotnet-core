@@ -27,11 +27,16 @@ namespace Devkit.Test
 
         public void Add<T>(T item) where T : new()
         {
+            EnsureId(item);
             _db.GetCollection<T>().Insert(item);
         }
 
         public void Add<T>(IEnumerable<T> items) where T : new()
         {
+            foreach (var item in items)
+            {
+                EnsureId(item);
+            }
             _db.GetCollection<T>().Insert(items);
         }
 
@@ -40,6 +45,7 @@ namespace Devkit.Test
             foreach (var item in items)
             {
                 item.CreatedOn = DateTime.UtcNow;
+                EnsureId(item);
             }
             _db.GetCollection<T>().Insert(items);
         }
@@ -47,7 +53,16 @@ namespace Devkit.Test
         public void AddWithAudit<T>(T item) where T : DocumentBase, new()
         {
             item.CreatedOn = DateTime.UtcNow;
+            EnsureId(item);
             _db.GetCollection<T>().Insert(item);
+        }
+
+        private static void EnsureId<T>(T item)
+        {
+            if (item is DocumentBase doc && string.IsNullOrEmpty(doc.Id))
+            {
+                doc.Id = ObjectId.NewObjectId().ToString();
+            }
         }
 
         public List<T> All<T>() where T : new()

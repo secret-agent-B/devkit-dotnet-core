@@ -25,7 +25,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\core\api\communication\Devkit.Communication.Security\Devkit.Communication.Security.csproj" />
-        <ProjectReference Include="..\..\..\..\core\api\payment\coins.ph\Devkit.Payment.CoinsPH\Devkit.Payment.CoinsPH.csproj" />
         <ProjectReference Include="..\..\..\..\core\sdk\webapi\Devkit.WebAPI\Devkit.WebAPI.csproj" />
         <ProjectReference Include="..\..\..\communication\Logistics.Communication.Store\Logistics.Communication.Store.csproj" />
     </ItemGroup>

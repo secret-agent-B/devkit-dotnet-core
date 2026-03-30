@@ -1,36 +1,112 @@
 # Devkit Microservice Framework
 
-DMF provides a base framework for developing microservices using .NET Core. The framework provides security, consistent patterns with developing your API endpoints, service-to-service communication through AMQP, and helper libraries that will help with testing, etc. I use this for my personal projects to help speed up my prototyping or development.
+A base framework for building microservices with .NET. Devkit provides authentication, CQRS patterns, service-to-service messaging over AMQP, centralized logging, and testing utilities to accelerate API development.
 
 ![High Level Design](/docs/images/high-level.png)
 
-# Table of Contents
+## Table of Contents
 
-1. [Run the demo APIs](#run-the-demo-apis)
-2. [Gateway](#gateway)
-   1. [Security](#gateway-security)
-   2. [Routing](#gateway-routing)
-3. [Domain APIs](#domain-apis)
-4. [How Tos](#how-tos)
-   1. [Service Bus](#service-bus)
+- [Prerequisites](#prerequisites)
+- [Architecture Overview](#architecture-overview)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Infrastructure](#infrastructure)
+- [Gateway](#gateway)
+  - [Security](#gateway-security)
+  - [Routing](#gateway-routing)
+- [Domain APIs](#domain-apis)
+  - [Creating a New API](#creating-a-new-api)
+  - [SDK Libraries](#sdk-libraries)
+- [Service Bus](#service-bus)
+  - [Defining Messages and Events](#defining-messages-and-events)
+  - [Consuming Messages](#consuming-messages)
+  - [Registering Consumers](#registering-consumers)
+  - [Contract Safety with Analyzers](#contract-safety-with-analyzers)
+- [Testing](#testing)
+  - [Unit Testing with Service Bus](#unit-testing-with-service-bus)
+  - [Integration Testing](#integration-testing)
+- [Service Ports](#service-ports)
 
-## Run the demo APIs
+---
 
-You'll need **Docker** installed.
+## Prerequisites
 
-1. Open up your command line on the root directory of the project
-2. Enter `cd infrastructure`
-3. Then `docker-compose up -d` to run backing Docker containers
-4. Back to the root with `cd .. `
-5. Then `docker-compose up -d` to run the APIs or Open up `Devkit.sln` file in Visual Studio and run the APIs from there.
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) (see `global.json`)
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+
+## Architecture Overview
+
+The system follows a microservice architecture with these key components:
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| API Gateway | [Ocelot](https://github.com/ThreeMammals/Ocelot) | Single entry point, routing, and authorization |
+| Service Discovery | [Consul](https://www.consul.io/) | Dynamic service registration and lookup |
+| Message Bus | [RabbitMQ](https://www.rabbitmq.com/) + [MassTransit](https://masstransit-project.com/) | Async inter-service communication |
+| Database | [MongoDB](https://www.mongodb.com/) | Data persistence per service |
+| Logging | [Elasticsearch](https://www.elastic.co/) + [Kibana](https://www.elastic.co/kibana) | Centralized log aggregation and visualization |
+| Caching | [Redis](https://redis.io/) | General caching and real-time features |
+
+Clients send requests to the **Gateway**, which authenticates via JWT and routes to the appropriate **Domain API** using Consul for service discovery. Domain APIs communicate internally through the **Service Bus** (RabbitMQ/MassTransit). Each service owns its own database.
+
+## Getting Started
+
+1. Start the infrastructure containers:
+   ```bash
+   cd infrastructure
+   docker-compose up -d
+   ```
+2. Start the API services (choose one):
+   ```bash
+   # Option A: Docker Compose
+   cd src
+   docker-compose up -d
+
+   # Option B: Visual Studio
+   # Open src/Devkit.sln and run from the IDE
+   ```
+
+## Project Structure
+
+```
+src/
+├── apps/
+│   ├── core/
+│   │   ├── api/           # Shared APIs (Gateway, Security, FileStore, Ratings)
+│   │   └── sdk/           # Reusable libraries (WebAPI, Patterns, Metrics, Test, Http)
+│   └── logistics-app/
+│       ├── communication/  # Message contracts and DTOs (per domain)
+│       └── domain/         # Domain APIs (Orders, Store, Vehicles)
+├── configs/                # Externalized JSON configuration files
+│   ├── gateway/            # Ocelot routing configs
+│   ├── infrastructure/     # Bus, logging configs
+│   └── services/           # Per-service configs
+└── tests/                  # Unit and integration test projects
+```
+
+## Infrastructure
+
+The `infrastructure/docker-compose.yaml` file provisions all backing services:
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Consul | 8500 | Service registry and health checks |
+| RabbitMQ | 5672, 15672 | Message broker (management UI on 15672) |
+| MongoDB | 27017 | Database |
+| Elasticsearch | 9200 | Log storage and search |
+| Kibana | 5601 | Log visualization dashboard |
+| Redis (cache) | 6382 | General-purpose cache |
+| Redis (chatr) | 6381 | Real-time features |
+| RedisInsight | 8001 | Redis management UI |
+| Portainer | 9000 | Container management UI |
 
 ## Gateway
 
-Gateway is an outward facing API that routes requests coming from clients, think of it as the single point of entry to the system. This API uses [Ocelot](https://github.com/ThreeMammals/Ocelot/tree/master) middleware to manage routing to `Domain APIs` also known as internal APIs. It also utilizes [Consul](https://www.consul.io/docs) as service registry. So when a request comes in Ocelot uses the `ServiceName` to look up a APIs registered in Consul with that name then `Consul` returns back the routing info to the API that needs to handle the request.
+The Gateway is the single entry point for all client requests. It uses [Ocelot](https://github.com/ThreeMammals/Ocelot) middleware to route requests to internal Domain APIs and [Consul](https://www.consul.io/) for dynamic service discovery. When a request comes in, Ocelot looks up the target service by `ServiceName` in Consul, which returns the routing information for that service.
 
-#### Gateway Security
+### Gateway Security
 
-Protect endpoints be defining requirements in the `RouteClaimsRequirement` within the route configuration of the endpoint.
+Protect endpoints by defining claim requirements in `RouteClaimsRequirement` within the route configuration:
 
 ```jsonc
 {
@@ -53,9 +129,11 @@ Protect endpoints be defining requirements in the `RouteClaimsRequirement` withi
 }
 ```
 
-#### Gateway Routing
+The Gateway supports role-based policies including `admin-policy`, `driver-policy`, `client-policy`, and `test-policy`, each mapped to specific roles.
 
-Below is an example of a routing configuration for Ocelot. The `ServiceName` refers to the API key that is registered in Consul service registry. The `ServiceName` is the name or key of the service that is registered in Consul. The Devkit.API library should automatically register your API with Consul. For more information about how you can configure the service see [Domain API setup](#creating-a-new-project).
+### Gateway Routing
+
+Below is a basic routing configuration. The `ServiceName` must match the name registered in Consul — the `Devkit.WebAPI` library handles service registration automatically.
 
 ```jsonc
 {
@@ -71,61 +149,74 @@ Below is an example of a routing configuration for Ocelot. The `ServiceName` ref
 }
 ```
 
-The `UpstreamHttpMethod` is an array of accepted HTTP verbs. The `UpstreamPathTemplate` is the route that the clients will need to send the request to. Let's say that the Gateway url is `https://my-app.io`; the URL to send the request to for this route is `https://my-app.io/d/hello-world`. `DownstreamPathTemplate` is the action route in your controller class. This is the internal API route where the request gets handled. If you need help with routing configs refer to the Ocelot [documentation](https://ocelot.readthedocs.io/en/latest/features/routing.html).
+| Property | Description |
+|----------|-------------|
+| `UpstreamHttpMethod` | Array of accepted HTTP verbs |
+| `UpstreamPathTemplate` | The public route clients send requests to (e.g., `https://my-app.io/d/hello-world`) |
+| `DownstreamPathTemplate` | The controller action route on the internal service |
+| `ServiceName` | Consul service name used for dynamic routing |
+
+For more details, see the Ocelot [routing documentation](https://ocelot.readthedocs.io/en/latest/features/routing.html).
 
 ## Domain APIs
 
-Domain APIs are your own APIs that handles requests coming in from the `Gateway`.
+Domain APIs handle requests routed from the Gateway. Each API owns its domain logic and data.
 
-### Creating a new API
+### Creating a New API
 
-It is very easy to get a service up and running using the framework, reference the `Devkit.WebAPI` project into your new .NET Core 5.0 Web API project. The `Devkit.WebAPI` framework references 3 Devkit projects, `Devkit.Patterns`, `Devkit.Metrics`, and `Devkit.ServiceBus`. `Devkit.Patterns` has wrapper classes for implementing the CQRS pattern with the `MediatR` library. `Devkit.Metrics` handles logging to `ElasticSearch`.
+To create a new service, reference the `Devkit.WebAPI` project in a new .NET Web API project. `Devkit.WebAPI` brings in the core framework libraries automatically.
 
-TODO: Cover support libraries here.
+### SDK Libraries
 
-### Add other APIs here...
+| Library | Purpose |
+|---------|---------|
+| `Devkit.WebAPI` | Base Web API setup, Consul registration, middleware pipeline |
+| `Devkit.Patterns` | CQRS pattern implementation using [MediatR](https://github.com/jbogard/MediatR) |
+| `Devkit.Metrics` | Centralized logging to Elasticsearch |
+| `Devkit.ServiceBus` | MassTransit-based messaging abstractions, bus configuration |
+| `Devkit.Http` | HTTP client utilities for service-to-service communication |
+| `Devkit.Test` | Test harness, integration test base classes, and fake consumer support |
 
 ---
 
-## How Tos
+## Service Bus
 
-### Service Bus
+The framework uses [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/) for asynchronous inter-service communication. If you prefer HTTP-based communication, you can use libraries like [Refit](https://github.com/reactiveui/refit) instead.
 
-This feature provides messaging between microservices with [RabbitMQ](https://www.rabbitmq.com/) and [MassTransit](https://masstransit-project.com/). **MassTransit** is by far the easiest message queue library to use out there for C#. I'm not gonna dive into as to why I picked AMQP vs HTTP for internal messaging you can still use libraries like [Refit](https://github.com/reactiveui/refit) if you prefer to go that route.
+### Defining Messages and Events
 
-To setup messaging you need to create the messages or events that you can send and receive between microservices. I usually just create a new project per microservice or domain. Example, within the Devkit solution you will see a project named `Logistics.Communication.Orders`. This project contains 2 folders `DTOs` and `Messages` that are related to orders.
+Create a dedicated communication project per domain (e.g., `Logistics.Communication.Orders`) with two folders:
 
-`Messages` folder contains interfaces about events within the application that want to you publish. An example of an event is the `IOrderSubmitted` interface - when someone created a new order and you want other microservices to use pieces of information about an order that was just submitted.
+- **`Messages/`** — Interfaces defining events and requests
+- **`DTOs/`** — Interfaces defining response contracts
 
-```c#
-// Example of an Event. This event is Published when a user successfully submitted an order.
+**Events** represent something that happened in the system:
+
+```csharp
+// Published when a user successfully submits an order.
 public interface IOrderSubmitted
 {
     string ClientUserName { get; }
-
     int ProductId { get; }
-
     double Price { get; }
-
-    ...
 }
 ```
 
-`Messages` folder is also where you place interfaces to send `Request`. Request is used for querying information from a microservice like `IGetUser`.
-Messages can only be interfaces that implements `Devkit.ServiceBus.Interfaces.IRequest`, this forces a pattern where nobody can put logic into these messages, and that they only act as message contracts. The response to a `Request` is defined within the `DTOs` folder. `DTOs` are just interfaces used as a contract to send and receive response from a `Request`.
+**Requests** query data from another service. They must implement `Devkit.ServiceBus.Interfaces.IRequest`, ensuring messages remain pure contracts with no logic:
 
-```c#
-// Example of a Request. This is what you send to the bus to request for user information from microservice.
+```csharp
+// Requests user information from the Security service.
 public interface IGetUser : Devkit.ServiceBus.Interfaces.IRequest
 {
     string UserName { get; set; }
 }
 ```
 
-To response to the `IGetUser` request you'll need to create a consumer class in the receiving microservice. Store your consumers within a folder to make it easier for us later on to register them.
+### Consuming Messages
 
-```c#
-// Message consumer for IGetUser
+To respond to an `IGetUser` request, create a consumer in the receiving service:
+
+```csharp
 public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
 {
     protected async override Task ConsumeRequest(ConsumeContext<IGetUser> context)
@@ -134,7 +225,6 @@ public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
 
         if (user == null)
         {
-            // send an error message back
             await context.RespondAsync<IConsumerException>(new
             {
                 ErrorMessage = $"Could not find user by user name ({context.Message.UserName})"
@@ -142,7 +232,6 @@ public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
         }
         else
         {
-            // send the user infromation back
             await context.RespondAsync<IUserDTO>(new
             {
                 user.Profile.FirstName,
@@ -155,13 +244,11 @@ public class GetUserConsumer : Devkit.ServiceBus.MessageConsumerBase<IGetUser>
 }
 ```
 
-Notice that we send anonymous types back using `RespondAsync<TResponse>`. You might be wondering what the heck would happen if someone changed the contract/interface? This is where `MassTransit.Analyzers` come in, `Devkit.ServiceBus` library comes with this library that will help identify anonymous types being sent or published through `MassTransit` that does not agree with the interface.
+### Registering Consumers
 
-![MassTransit.Analyzer warning](/docs/images/mt-analyzer-warning.png)
+Use `MassTransit`'s `AddConsumersFromNamespaceContaining<T>` to register all consumers in a namespace at once. Implement `IBusRegistry` to wire them up:
 
-To wire up the consumers we will use `MassTransit`'s `IServiceCollectionBusConfigurator` and its extension method `AddConsumersFromNamespaceContaining<T>`. Using the `AddConsumersFromNamespaceContaining` method, pass in one of your consumers. This will add all the consumer in the same or deeper namespace.
-
-```c#
+```csharp
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 
@@ -174,30 +261,41 @@ public class SecurityBusRegistry : Devkit.ServiceBus.Interfaces.IBusRegistry
 }
 ```
 
-#### Testing with Service Bus (Unit Test)
+### Contract Safety with Analyzers
 
-I rely heavily on `MassTransit`'s `InMemoryTestHarness` for testing. With unit test you basically just new up an instance of an `InMemoryTestHarness` then add the consumer call the `Start` method.
+Responses use anonymous types with `RespondAsync<TResponse>`. The `MassTransit.Analyzers` package (included with `Devkit.ServiceBus`) detects mismatches between anonymous types and their target interfaces at compile time:
 
-```c#
+![MassTransit.Analyzer warning](/docs/images/mt-analyzer-warning.png)
+
+---
+
+## Testing
+
+### Unit Testing with Service Bus
+
+Use MassTransit's `InMemoryTestHarness` for unit tests. This provides an in-memory bus that captures all published and sent messages:
+
+```csharp
 this.TestHarness = new InMemoryTestHarness();
 this.TestHarness.Consumer<FakeGetUserConsumer>();
 this.TestHarness.Start().Wait();
 
-// Pass the IBus within the test harness, it's where messages will be sent to.
-var mediatRHandler = new CreateOrderHandler(this.Repository, this.TestHarness.Bus);
-mediatRHandler.Handle(command, CancellationToken.None);
+var handler = new CreateOrderHandler(this.Repository, this.TestHarness.Bus);
+handler.Handle(command, CancellationToken.None);
 
-// Check the messages to confirm that we published the event.
+// Verify the event was published
 Assert.True(await this.TestHarness.Published.Any<IOrderCreated>());
 ```
 
-#### Testing with Service Bus using IClassFixture<AppTestFixture<TStartup>>
+### Integration Testing
 
-The `Devkit.Test` project contains a base class called `IntegrationTestBase<TSUT, TStartup>` where TSUT is the command or query that is being tested, and TStartup is the Startup class that will help us spin up your service to send HTTP requests to test the entire flow; from the controller all the way to the command or query handler and so on. With this setup you can test to make sure that the messages are being sent out and the data that needs to be sent out are all in place.
+The `Devkit.Test` library provides `IntegrationTestBase<TSUT, TStartup>` for full end-to-end testing — from the HTTP request through the controller, handler, and service bus.
 
-In some microservice, you will need to register fake consumers to respond to `Requests`. Below is a fake registry that adds a fake consumer that responds with bogus values
+#### Setting Up Fake Consumers
 
-```c#
+Register fake consumers to simulate responses from other services during integration tests:
+
+```csharp
 public class TestOrdersBusRegistry : IBusRegistry
 {
     public void RegisterConsumers(IServiceCollectionBusConfigurator configurator)
@@ -221,10 +319,13 @@ public class FakeGetUserConsumer : Devkit.ServiceBus.Test.FakeMessageConsumerBas
 }
 ```
 
-Register the fake registry into DI like the example below. When your handler sends a `Request` for data through the service bus, the fake consumer registered within the fake registry will respond to the request. I usually create one IntegrationBase class per project so that I can just resuse my setup to test different endpoints.
+#### Creating a Reusable Test Base
 
-```c#
-public abstract class OrdersIntegrationTestBase<TRequest> : Devkit.Test.IntegrationTestBase<TRequest, Logistics.Orders.API.Startup>
+Create one integration base class per domain to reuse the test setup across endpoints:
+
+```csharp
+public abstract class OrdersIntegrationTestBase<TRequest>
+    : Devkit.Test.IntegrationTestBase<TRequest, Logistics.Orders.API.Startup>
 {
     protected OrdersIntegrationTestBase(AppTestFixture<Startup> testFixture)
         : base(testFixture)
@@ -234,6 +335,21 @@ public abstract class OrdersIntegrationTestBase<TRequest> : Devkit.Test.Integrat
             services.AddSingleton<IBusRegistry, TestOrdersBusRegistry>();
         });
     }
-    ...
 }
 ```
+
+---
+
+## Service Ports
+
+Quick reference for all services when running locally with Docker Compose:
+
+| Service | Port |
+|---------|------|
+| Gateway | 8001 |
+| Security API | 8002 |
+| FileStore API | 8003 |
+| Ratings API | 8005 |
+| Orders API | 8011 |
+| Store API | 8012 |
+| Vehicles API | 8013 |

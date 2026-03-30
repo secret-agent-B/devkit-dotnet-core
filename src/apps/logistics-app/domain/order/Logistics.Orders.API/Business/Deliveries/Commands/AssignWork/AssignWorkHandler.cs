@@ -10,7 +10,6 @@ namespace Logistics.Orders.API.Business.Deliveries.Commands.AssignWork
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Devkit.Communication.ChatR.Messages;
     using Devkit.Communication.Security.Messages;
     using Devkit.Data.Interfaces;
     using Devkit.Patterns;
@@ -125,36 +124,6 @@ namespace Logistics.Orders.API.Business.Deliveries.Commands.AssignWork
             this.Response = new OrderVM(updatedOrder);
 
             await this.Response.SetUserInfos(this._getUsersClient);
-        }
-
-        /// <summary>
-        /// Posts the processing.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellationToken.</param>
-        protected async override Task PostProcessing(CancellationToken cancellationToken)
-        {
-            // Send a command to start a ChatR session.
-            await this._bus.Publish<IStartSession>(
-                new
-                {
-                    Id = $"{this.Response.Id}_{this.Response.DriverUserName}",
-                    Topic = this.Response.ItemName,
-                    Participants = new[]
-                    {
-                        new
-                        {
-                            Role = "client",
-                            UserName = this.Response.ClientUserName,
-                            PhoneNumber = this.Response.Client["PhoneNumber"]?.ToString()
-                        },
-                        new
-                        {
-                            Role = "driver",
-                            UserName = this.Response.DriverUserName,
-                            PhoneNumber = this.Response.Driver["PhoneNumber"]?.ToString()
-                        }
-                    }
-                }, cancellationToken);
         }
 
         /// <summary>
