@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
         - name: api-cache
-          image: bitnami/redis:latest
+          image: soldevelo/redis:latest
           resources:
             limits:
               memory: "256Mi"
